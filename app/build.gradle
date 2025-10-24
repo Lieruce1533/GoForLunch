@@ -5,11 +5,11 @@ plugins {
 
 android {
     namespace 'com.lieruce.goforlunch'
-    compileSdk 34
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.lieruce.goforlunch"
-        minSdk 21
+        minSdk 23
         targetSdk 34
         versionCode 1
         versionName "1.0"
@@ -43,6 +43,7 @@ dependencies {
     implementation libs.credentials
     implementation libs.credentials.play.services.auth
     implementation libs.googleid
+    implementation libs.firebase.ui.auth
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core

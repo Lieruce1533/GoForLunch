@@ -12,7 +12,20 @@
           "package_name": "com.lieruce.goforlunch"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "601473970462-pamhu9vo952iin9552jnq7n7jns54oes.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lieruce.goforlunch",
+            "certificate_hash": "b834b40c186b0a863adedd6bdf8fd7cf225a686b"
+          }
+        },
+        {
+          "client_id": "601473970462-og4clod2spfs5jkbfprc9n2v3cf65q92.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAY4xslmuD-tVf2j8mBw1WXugJAbRzhxM0"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "601473970462-og4clod2spfs5jkbfprc9n2v3cf65q92.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
