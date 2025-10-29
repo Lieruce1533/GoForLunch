@@ -46,6 +46,10 @@ dependencies {
     // Import the BoM for the Firebase platform
     implementation platform(libs.firebase.bom)
 
+    // ViewModel and LiveData
+    implementation libs.lifecycle.viewmodel.ktx
+    implementation libs.lifecycle.livedata.ktx
+
     implementation libs.appcompat
     implementation libs.material
     implementation libs.activity

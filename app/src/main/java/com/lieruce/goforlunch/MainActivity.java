@@ -2,22 +2,24 @@ package com.lieruce.goforlunch;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.android.material.snackbar.Snackbar;
+import com.lieruce.goforlunch.viewmodel.MainViewModel;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    private MainViewModel viewModel;
 
     private final ActivityResultLauncher<Intent> signInLauncher =
             registerForActivityResult(new FirebaseAuthUIActivityResultContract(), this::onSignInResult);
@@ -27,14 +29,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            // User is signed in
-            showSnackBar("User is already signed in");
-        } else {
-            // No user is signed in
-            launchSignInFlow();
-        }
+        // Initialize ViewModel
+        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+
+        // Observe the user's authentication state
+        viewModel.getUserLiveData().observe(this, firebaseUser -> {
+            if (firebaseUser != null) {
+                // User is signed in, show a welcome message
+                showSnackBar("Welcome " + firebaseUser.getDisplayName());
+            } else {
+                // No user is signed in, launch the sign-in flow
+                launchSignInFlow();
+            }
+        });
     }
 
     private void launchSignInFlow() {
@@ -55,14 +62,11 @@ public class MainActivity extends AppCompatActivity {
     private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
-            // Successfully signed in
-            showSnackBar("Sign in successful");
-            // ...
+            // Successfully signed in, tell the ViewModel to refresh its state
+            showSnackBar("Sign in successful!");
+            viewModel.refreshUser(); // The observer will handle the UI update
         } else {
-            // Sign in failed. If response is null the user canceled the
-            // sign-in flow using the back button. Otherwise check
-            // response.getError().getErrorCode() and handle the error.
-            // ...
+            // Sign in failed
             if (response == null) {
                 showSnackBar("Sign in cancelled");
             } else if (response.getError() != null) {
@@ -72,6 +76,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showSnackBar(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        Snackbar.make(findViewById(R.id.main), message, Snackbar.LENGTH_SHORT).show();
     }
 }
