@@ -12,6 +12,7 @@ import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
 import com.google.android.material.snackbar.Snackbar;
+import com.lieruce.goforlunch.databinding.ActivityMainBinding;
 import com.lieruce.goforlunch.viewmodel.MainViewModel;
 
 import java.util.Arrays;
@@ -20,6 +21,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private MainViewModel viewModel;
+    private ActivityMainBinding binding;
 
     private final ActivityResultLauncher<Intent> signInLauncher =
             registerForActivityResult(new FirebaseAuthUIActivityResultContract(), this::onSignInResult);
@@ -27,10 +29,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         // Initialize ViewModel
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+
+        // Initialize button
+        binding.buttonDisconnect.setOnClickListener(v -> signOut());
+
 
         // Observe the user's authentication state
         viewModel.getUserLiveData().observe(this, firebaseUser -> {
@@ -42,6 +49,15 @@ public class MainActivity extends AppCompatActivity {
                 launchSignInFlow();
             }
         });
+    }
+
+    private void signOut() {
+        AuthUI.getInstance()
+                .signOut(this)
+                .addOnCompleteListener(task -> {
+                    // After sign out, refresh the user state
+                    viewModel.refreshUser();
+                });
     }
 
     private void launchSignInFlow() {
@@ -76,6 +92,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showSnackBar(String message) {
-        Snackbar.make(findViewById(R.id.main), message, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_SHORT).show();
     }
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "601473970462",
+    "project_id": "goforlunch-fc",
+    "storage_bucket": "goforlunch-fc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:601473970462:android:ec32ba7972eef4950dd90f",
+        "android_client_info": {
+          "package_name": "com.lieruce.goforlunch"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAY4xslmuD-tVf2j8mBw1WXugJAbRzhxM0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

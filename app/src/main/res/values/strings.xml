@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Go4Lunch</string>
     <string name="go_for_a_lunch_soon">Go For A Lunch! Soon...</string>
+    <string name="Disconnect">Disconnect</string>
 </resources>
