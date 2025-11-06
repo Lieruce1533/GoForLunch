@@ -24,3 +24,17 @@
 
 *   **Project Synchronization:** Addressed how to keep the project and our conversation history synchronized across multiple machines.
     *   **Solution:** Confirmed the use of a central Git repository. The `.gitignore` file was checked to ensure it correctly excludes machine-specific files like `local.properties`. This log file itself will be committed to Git to sync our conversation history.
+
+## Session: 2025-11-01
+
+### Summary of Work:
+
+*   **Build Warning Resolution:** Investigated and resolved several build warnings.
+    *   **Action:** Updated outdated dependencies (`firebase-bom`, `lifecycle-viewmodel-ktx`, `lifecycle-livedata-ktx`) in `gradle/libs.versions.toml`.
+    *   **Action:** Resolved a Java version deprecation warning by updating the `compileOptions` in `app/build.gradle` from Java 8 to Java 17.
+
+*   **Repository Pattern Implementation:** Refactored the authentication logic to introduce a repository, improving the MVVM architecture.
+    *   **Action:** Created `AuthRepository.java` to act as the single source of truth for authentication data, abstracting `FirebaseAuth` from the rest of the app.
+    *   **Action:** Created `ViewModelFactory.java` to handle the creation of ViewModels with dependencies.
+    *   **Action:** Updated `MainViewModel.java` to use the `AuthRepository` for all authentication-related tasks.
+    *   **Action:** Refactored `MainActivity.java` to use the `ViewModelFactory` and communicate only with the `MainViewModel`, fully decoupling it from the authentication implementation.

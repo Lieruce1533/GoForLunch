@@ -1,18 +1,22 @@
 package com.lieruce.goforlunch.viewmodel;
 
+import android.content.Context;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.google.firebase.auth.FirebaseAuth;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
+import com.lieruce.goforlunch.AuthRepository;
 
 public class MainViewModel extends ViewModel {
 
     private final MutableLiveData<FirebaseUser> userLiveData = new MutableLiveData<>();
+    private final AuthRepository authRepository;
 
-    public MainViewModel() {
-        // Check the initial state when the ViewModel is created
+    public MainViewModel(AuthRepository authRepository) {
+        this.authRepository = authRepository;
         refreshUser();
     }
 
@@ -20,8 +24,11 @@ public class MainViewModel extends ViewModel {
         return userLiveData;
     }
 
-    // Call this method to re-check the current user status
     public void refreshUser() {
-        userLiveData.setValue(FirebaseAuth.getInstance().getCurrentUser());
+        userLiveData.setValue(authRepository.getCurrentUser());
+    }
+
+    public Task<Void> signOut(Context context) {
+        return authRepository.signOut(context);
     }
 }

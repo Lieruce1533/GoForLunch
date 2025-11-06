@@ -14,6 +14,7 @@ import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
 import com.google.android.material.snackbar.Snackbar;
 import com.lieruce.goforlunch.databinding.ActivityMainBinding;
 import com.lieruce.goforlunch.viewmodel.MainViewModel;
+import com.lieruce.goforlunch.viewmodel.ViewModelFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         // Initialize ViewModel
-        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(MainViewModel.class);
 
         // Initialize button
         binding.buttonDisconnect.setOnClickListener(v -> signOut());
@@ -52,8 +53,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void signOut() {
-        AuthUI.getInstance()
-                .signOut(this)
+        viewModel.signOut(this)
                 .addOnCompleteListener(task -> {
                     // After sign out, refresh the user state
                     viewModel.refreshUser();
