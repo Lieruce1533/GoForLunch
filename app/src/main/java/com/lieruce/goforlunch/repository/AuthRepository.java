@@ -1,4 +1,4 @@
-package com.lieruce.goforlunch;
+package com.lieruce.goforlunch.repository;
 
 import android.content.Context;
 
@@ -7,7 +7,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-// TODO: Move to a repositories package
 public class AuthRepository {
 
     private final FirebaseAuth firebaseAuth;

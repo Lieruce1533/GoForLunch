@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
-import com.lieruce.goforlunch.AuthRepository;
+import com.lieruce.goforlunch.repository.AuthRepository;
 
 public class MainViewModel extends ViewModel {
 

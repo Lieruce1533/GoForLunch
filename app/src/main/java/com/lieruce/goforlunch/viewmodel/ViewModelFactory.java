@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.lieruce.goforlunch.AuthRepository;
+import com.lieruce.goforlunch.repository.AuthRepository;
 
 public class ViewModelFactory implements ViewModelProvider.Factory {
 
