@@ -9,14 +9,17 @@ import androidx.lifecycle.ViewModel;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 import com.lieruce.goforlunch.repository.AuthRepository;
+import com.lieruce.goforlunch.repository.UserRepository;
 
 public class MainViewModel extends ViewModel {
 
     private final MutableLiveData<FirebaseUser> userLiveData = new MutableLiveData<>();
     private final AuthRepository authRepository;
+    private final UserRepository userRepository;
 
-    public MainViewModel(AuthRepository authRepository) {
+    public MainViewModel(AuthRepository authRepository, UserRepository userRepository) {
         this.authRepository = authRepository;
+        this.userRepository = userRepository;
         refreshUser();
     }
 
@@ -30,5 +33,9 @@ public class MainViewModel extends ViewModel {
 
     public Task<Void> signOut(Context context) {
         return authRepository.signOut(context);
+    }
+
+    public Task<Void> createUser() {
+        return userRepository.createUser(authRepository.getCurrentUser());
     }
 }

@@ -51,3 +51,14 @@
     *   **Action:** Moved `AuthRepository.java` to the new package.
     *   **Action:** Updated all import statements in `MainViewModel.java` and `ViewModelFactory.java` to reflect the new location.
     *   **Action:** Instructed on the manual deletion of the old, misplaced `AuthRepository.java` file and an incorrectly created empty file.
+
+## Session: 2025-11-03
+
+### Summary of Work:
+
+*   **Firestore Integration - User Creation:** Implemented the logic to save user data to Cloud Firestore upon registration.
+    *   **Documentation:** Created a `FIRESTORE_EXPLANATION.md` file detailing Firestore concepts, data structure, and real-time capabilities.
+    *   **Action (Model):** Created a `User.java` data model to represent user data in the app.
+    *   **Action (Repository):** Created `UserRepository.java` to handle all database operations for the `users` collection, including a `createUser` method.
+    *   **Action (ViewModel):** Updated `ViewModelFactory` and `MainViewModel` to include and use the `UserRepository`.
+    *   **Action (Activity):** Modified `MainActivity`'s `onSignInResult` method to check for new users and trigger the `createUser` flow, saving them to Firestore.

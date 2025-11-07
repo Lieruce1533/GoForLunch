@@ -79,8 +79,16 @@ public class MainActivity extends AppCompatActivity {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
             // Successfully signed in, tell the ViewModel to refresh its state
-            showSnackBar("Sign in successful!");
             viewModel.refreshUser(); // The observer will handle the UI update
+
+            // Check if user is new
+            if (response.isNewUser()) {
+                viewModel.createUser().addOnSuccessListener(aVoid -> {
+                    showSnackBar("User account created in Firestore!");
+                }).addOnFailureListener(e -> {
+                    showSnackBar("Error creating user in Firestore.");
+                });
+            }
         } else {
             // Sign in failed
             if (response == null) {
