@@ -78,3 +78,16 @@
     *   **Decision:** We will use a **Single-Activity Architecture** with `MainActivity` hosting multiple Fragments.
     *   **Decision:** The UI will be composed of three main Fragments: `MapFragment`, `RestaurantsFragment`, and `WorkmatesFragment`, managed by a `BottomNavigationView` and the Jetpack Navigation Component.
     *   **Decision:** We will distinguish between **Data Models** (like `User`, which mirrors Firestore) and **UI Models** (like `Workmate`, which is tailored for display). The ViewModel will be responsible for transforming data models into UI models.
+
+## Session: 2025-11-09
+
+### Summary of Work:
+
+*   **Firestore Security Implemented:** Resolved a critical `PERMISSION_DENIED` error when creating user documents.
+    *   **Action:** Explained and provided the necessary Firestore security rules to allow authenticated users to create and manage their own user documents securely. The rule ensures a user can only write to a document matching their own UID.
+
+*   **Robust User Creation Logic:** Refactored the user creation process to be more resilient and reliable.
+    *   **Problem:** Identified that the user record in Firestore was only created on the very first login, which could lead to missing data if the initial write failed.
+    *   **Solution:** Implemented an "upsert" (update/insert) strategy.
+    *   **Action (`UserRepository`):** Modified the `createUser` method to use `set(..., SetOptions.merge())`. This ensures that if a user document already exists, it is updated safely without overwriting fields, and if it doesn't exist, it is created.
+    *   **Action (`MainActivity`):** Removed the conditional check for `isNewUser()` and now trigger the user creation/update flow on every successful login, guaranteeing the Firestore database is always in sync with the authenticated user.
