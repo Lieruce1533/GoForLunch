@@ -81,14 +81,12 @@ public class MainActivity extends AppCompatActivity {
             // Successfully signed in, tell the ViewModel to refresh its state
             viewModel.refreshUser(); // The observer will handle the UI update
 
-            // Check if user is new
-            if (response.isNewUser()) {
-                viewModel.createUser().addOnSuccessListener(aVoid -> {
-                    showSnackBar("User account created in Firestore!");
-                }).addOnFailureListener(e -> {
-                    showSnackBar("Error creating user in Firestore.");
-                });
-            }
+            // Always attempt to create/update the user in Firestore upon successful login
+            viewModel.createUser().addOnSuccessListener(aVoid -> {
+                showSnackBar("User data synced with Firestore!");
+            }).addOnFailureListener(e -> {
+                showSnackBar("Error syncing user data with Firestore.");
+            });
         } else {
             // Sign in failed
             if (response == null) {

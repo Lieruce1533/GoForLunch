@@ -4,6 +4,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.lieruce.goforlunch.model.User;
 
 public class UserRepository {
@@ -34,6 +35,8 @@ public class UserRepository {
 
         User userToCreate = new User(uid, username, avatarUrl);
 
-        return usersCollection.document(uid).set(userToCreate);
+        // Use SetOptions.merge() to create the user if it doesn't exist,
+        // or update it if it does, without overwriting other fields.
+        return usersCollection.document(uid).set(userToCreate, SetOptions.merge());
     }
 }
