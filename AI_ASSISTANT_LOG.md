@@ -62,3 +62,19 @@
     *   **Action (Repository):** Created `UserRepository.java` to handle all database operations for the `users` collection, including a `createUser` method.
     *   **Action (ViewModel):** Updated `ViewModelFactory` and `MainViewModel` to include and use the `UserRepository`.
     *   **Action (Activity):** Modified `MainActivity`'s `onSignInResult` method to check for new users and trigger the `createUser` flow, saving them to Firestore.
+
+## Session: 2025-11-04
+
+### Summary of Work:
+
+*   **Git Workflow Cleanup:** Performed a major Git refactoring to establish a clean and professional `develop`-based workflow.
+    *   **Documentation:** Created `GIT_REBASE_PROCEDURE.md` to document the complex rebase and cleanup process.
+    *   **Action:** Stashed uncommitted work, created a `develop` branch from `main`, and rebased the `Authentication` branch onto `develop`.
+    *   **Action:** Merged the rebased `Authentication` branch into `develop` and deleted it.
+    *   **Action:** Created a new `feature/firestore-user-model` branch from `develop` and applied the stashed work to it, successfully isolating the feature.
+    *   **Action:** Pushed the new branches and deleted the obsolete branch from the remote repository.
+
+*   **Architectural Planning:** Defined a clear, modern architecture for the application's UI.
+    *   **Decision:** We will use a **Single-Activity Architecture** with `MainActivity` hosting multiple Fragments.
+    *   **Decision:** The UI will be composed of three main Fragments: `MapFragment`, `RestaurantsFragment`, and `WorkmatesFragment`, managed by a `BottomNavigationView` and the Jetpack Navigation Component.
+    *   **Decision:** We will distinguish between **Data Models** (like `User`, which mirrors Firestore) and **UI Models** (like `Workmate`, which is tailored for display). The ViewModel will be responsible for transforming data models into UI models.
