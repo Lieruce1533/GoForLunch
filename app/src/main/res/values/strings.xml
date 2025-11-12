@@ -2,4 +2,9 @@
     <string name="app_name">Go4Lunch</string>
     <string name="go_for_a_lunch_soon">Go For A Lunch! Soon...</string>
     <string name="Disconnect">Disconnect</string>
+    <string name="map_fragment">Map Fragment</string>
+    <string name="restaurants_fragment">Restaurants Fragment</string>
+    <string name="map_view">Map View</string>
+    <string name="restaurants">Restaurants</string>
+    <string name="workmates">Workmates</string>
 </resources>

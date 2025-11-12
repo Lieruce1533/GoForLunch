@@ -83,11 +83,13 @@
 
 ### Summary of Work:
 
-*   **Firestore Security Implemented:** Resolved a critical `PERMISSION_DENIED` error when creating user documents.
-    *   **Action:** Explained and provided the necessary Firestore security rules to allow authenticated users to create and manage their own user documents securely. The rule ensures a user can only write to a document matching their own UID.
+*   **Single-Activity Architecture Setup:** Built the foundational structure for the app's UI using Fragments and the Jetpack Navigation Component.
+    *   **Action (Dependencies):** Added `navigation-fragment` and `navigation-ui` dependencies to the project.
+    *   **Action (Fragments):** Created placeholder Fragments and layouts for `MapFragment`, `RestaurantsFragment`, and `WorkmatesFragment`.
+    *   **Action (Layout):** Updated `activity_main.xml` to include a `FragmentContainerView` (as a `NavHost`) and a `BottomNavigationView`.
+    *   **Action (Navigation):** Created a `navigation/nav_graph.xml` to define the app's navigation destinations and a `menu/main_menu.xml` for the bottom navigation icons.
+    *   **Action (Activity):** Refactored `MainActivity.java` to link the `NavController` with the `BottomNavigationView` and the toolbar, correctly setting up the navigation host.
 
 *   **Robust User Creation Logic:** Refactored the user creation process to be more resilient and reliable.
-    *   **Problem:** Identified that the user record in Firestore was only created on the very first login, which could lead to missing data if the initial write failed.
-    *   **Solution:** Implemented an "upsert" (update/insert) strategy.
-    *   **Action (`UserRepository`):** Modified the `createUser` method to use `set(..., SetOptions.merge())`. This ensures that if a user document already exists, it is updated safely without overwriting fields, and if it doesn't exist, it is created.
-    *   **Action (`MainActivity`):** Removed the conditional check for `isNewUser()` and now trigger the user creation/update flow on every successful login, guaranteeing the Firestore database is always in sync with the authenticated user.
+    *   **Action (`UserRepository`):** Modified the `createUser` method to use `set(..., SetOptions.merge())`. This "upsert" strategy ensures that user data is safely created on the first login or updated on subsequent logins without overwriting existing fields (like a chosen restaurant).
+    *   **Action (`MainActivity`):** Removed the conditional `isNewUser()` check to ensure the `createUser` (upsert) logic is called on every successful login, guaranteeing the database is always in sync.

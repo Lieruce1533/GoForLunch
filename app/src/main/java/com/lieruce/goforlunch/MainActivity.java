@@ -6,6 +6,10 @@ import android.os.Bundle;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
@@ -17,7 +21,9 @@ import com.lieruce.goforlunch.viewmodel.MainViewModel;
 import com.lieruce.goforlunch.viewmodel.ViewModelFactory;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,18 +39,13 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Initialize ViewModel
         viewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(MainViewModel.class);
-
-        // Initialize button
-        binding.buttonDisconnect.setOnClickListener(v -> signOut());
-
 
         // Observe the user's authentication state
         viewModel.getUserLiveData().observe(this, firebaseUser -> {
             if (firebaseUser != null) {
-                // User is signed in, show a welcome message
-                showSnackBar("Welcome " + firebaseUser.getDisplayName());
+                // User is signed in, setup the main UI
+                setupNavigation();
             } else {
                 // No user is signed in, launch the sign-in flow
                 launchSignInFlow();
@@ -52,12 +53,30 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void signOut() {
-        viewModel.signOut(this)
-                .addOnCompleteListener(task -> {
-                    // After sign out, refresh the user state
-                    viewModel.refreshUser();
-                });
+    private void setupNavigation() {
+        // Find the NavController
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        NavController navController = navHostFragment.getNavController();
+
+        // Define top-level destinations
+        Set<Integer> topLevelDestinations = new HashSet<>();
+        topLevelDestinations.add(R.id.navigation_map);
+        topLevelDestinations.add(R.id.navigation_restaurants);
+        topLevelDestinations.add(R.id.navigation_workmates);
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(topLevelDestinations).build();
+
+        // Link the NavController to the Toolbar
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+
+        // Link the BottomNavigationView to the NavController
+        NavigationUI.setupWithNavController(binding.bottomNavView, navController);
+
+        // Set the menu for the BottomNavigationView
+        binding.bottomNavView.getMenu().clear(); // Clear existing menu
+        binding.bottomNavView.inflateMenu(R.menu.main_menu);
+
+        // Set the navigation graph
+        navController.setGraph(R.navigation.nav_graph);
     }
 
     private void launchSignInFlow() {

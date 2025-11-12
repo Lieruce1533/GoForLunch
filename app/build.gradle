@@ -54,6 +54,10 @@ dependencies {
     implementation libs.lifecycle.viewmodel.ktx
     implementation libs.lifecycle.livedata.ktx
 
+    // Navigation
+    implementation libs.navigation.fragment
+    implementation libs.navigation.ui
+
     implementation libs.appcompat
     implementation libs.material
     implementation libs.activity
