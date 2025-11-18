@@ -1,10 +1,14 @@
 package com.lieruce.goforlunch;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -17,6 +21,7 @@ import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
 import com.google.android.material.snackbar.Snackbar;
 import com.lieruce.goforlunch.databinding.ActivityMainBinding;
+import com.lieruce.goforlunch.repository.LocationRepository;
 import com.lieruce.goforlunch.viewmodel.MainViewModel;
 import com.lieruce.goforlunch.viewmodel.ViewModelFactory;
 
@@ -33,6 +38,17 @@ public class MainActivity extends AppCompatActivity {
     private final ActivityResultLauncher<Intent> signInLauncher =
             registerForActivityResult(new FirebaseAuthUIActivityResultContract(), this::onSignInResult);
 
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    startLocationUpdates();
+                } else {
+                    // Explain to the user that the feature is unavailable because the
+                    // features requires a permission that the user has denied.
+                    showSnackBar("Location permission denied. Map features disabled.");
+                }
+            });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,73 +57,65 @@ public class MainActivity extends AppCompatActivity {
 
         viewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(MainViewModel.class);
 
-        // Observe the user's authentication state
         viewModel.getUserLiveData().observe(this, firebaseUser -> {
             if (firebaseUser != null) {
-                // User is signed in, setup the main UI
                 setupNavigation();
+                requestLocationPermission();
             } else {
-                // No user is signed in, launch the sign-in flow
                 launchSignInFlow();
             }
         });
     }
 
     private void setupNavigation() {
-        // Find the NavController
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         NavController navController = navHostFragment.getNavController();
-
-        // Define top-level destinations
         Set<Integer> topLevelDestinations = new HashSet<>();
         topLevelDestinations.add(R.id.navigation_map);
         topLevelDestinations.add(R.id.navigation_restaurants);
         topLevelDestinations.add(R.id.navigation_workmates);
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(topLevelDestinations).build();
-
-        // Link the NavController to the Toolbar
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-
-        // Link the BottomNavigationView to the NavController
         NavigationUI.setupWithNavController(binding.bottomNavView, navController);
-
-        // Set the menu for the BottomNavigationView
-        binding.bottomNavView.getMenu().clear(); // Clear existing menu
+        binding.bottomNavView.getMenu().clear();
         binding.bottomNavView.inflateMenu(R.menu.main_menu);
-
-        // Set the navigation graph
         navController.setGraph(R.navigation.nav_graph);
     }
 
+    private void requestLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            startLocationUpdates();
+        } else {
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+    }
+
+    private void startLocationUpdates() {
+        LocationRepository.getInstance(this).startLocationUpdates();
+        showSnackBar("Location updates started!");
+    }
+
     private void launchSignInFlow() {
-        // Choose authentication providers
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build(),
                 new AuthUI.IdpConfig.GoogleBuilder().build());
-
-        // Create and launch sign-in intent
         Intent signInIntent = AuthUI.getInstance()
                 .createSignInIntentBuilder()
                 .setAvailableProviders(providers)
                 .build();
-
         signInLauncher.launch(signInIntent);
     }
 
     private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
-            // Successfully signed in, tell the ViewModel to refresh its state
-            viewModel.refreshUser(); // The observer will handle the UI update
-
-            // Always attempt to create/update the user in Firestore upon successful login
+            viewModel.refreshUser();
             viewModel.createUser().addOnSuccessListener(aVoid -> {
                 showSnackBar("User data synced with Firestore!");
             }).addOnFailureListener(e -> {
                 showSnackBar("Error syncing user data with Firestore.");
             });
         } else {
-            // Sign in failed
             if (response == null) {
                 showSnackBar("Sign in cancelled");
             } else if (response.getError() != null) {

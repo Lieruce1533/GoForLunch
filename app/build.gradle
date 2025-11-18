@@ -54,14 +54,14 @@ dependencies {
     implementation libs.lifecycle.viewmodel.ktx
     implementation libs.lifecycle.livedata.ktx
 
-<<<<<<< HEAD
+
     // Navigation
     implementation libs.navigation.fragment
     implementation libs.navigation.ui
-=======
+
     // Location
     implementation libs.play.services.location
->>>>>>> b0fcee6 (graddle files added)
+
 
     implementation libs.appcompat
     implementation libs.material
@@ -73,6 +73,7 @@ dependencies {
     implementation libs.credentials.play.services.auth
     implementation libs.googleid
     implementation libs.firebase.ui.auth
+    implementation libs.navigation.runtime
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
