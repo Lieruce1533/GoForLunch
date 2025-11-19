@@ -93,3 +93,21 @@
 *   **Robust User Creation Logic:** Refactored the user creation process to be more resilient and reliable.
     *   **Action (`UserRepository`):** Modified the `createUser` method to use `set(..., SetOptions.merge())`. This "upsert" strategy ensures that user data is safely created on the first login or updated on subsequent logins without overwriting existing fields (like a chosen restaurant).
     *   **Action (`MainActivity`):** Removed the conditional `isNewUser()` check to ensure the `createUser` (upsert) logic is called on every successful login, guaranteeing the database is always in sync.
+
+## Session: 2025-11-10
+
+### Summary of Work:
+
+*   **Git Workflow Management:** Enforced proper Git process by creating a new `feature/location-services` branch from `develop` before implementing new features. Resolved a `rebase conflict` in the Gradle files.
+
+*   **Location Services Foundation (Step 1):** Implemented the core components required to get the user's location.
+    *   **Action (Permission):** Added the `ACCESS_FINE_LOCATION` permission to `AndroidManifest.xml`.
+    *   **Action (Dependency):** Added the `play-services-location` dependency to the project.
+    *   **Action (Repository):** Created `LocationRepository.java` to abstract the complexity of the Fused Location Provider and expose location via `LiveData`.
+    *   **Action (Runtime Permissions):** Implemented the full runtime permission request flow in `MainActivity.java`, which now asks the user for location access upon login and starts location updates when granted.
+
+*   **Restaurant Data Layer (Step 2):** Built the data layer to fetch nearby restaurant information from the Google Places API.
+    *   **Action (Dependency):** Added the `com.google.android.libraries.places:places` dependency.
+    *   **Action (API Key):** Securely configured the Google Places API key by reading it from `local.properties` and exposing it to the app via `BuildConfig` and the `AndroidManifest.xml`.
+    *   **Action (Model):** Created a `Restaurant.java` data model to represent a restaurant's data within the app.
+    *   **Action (Repository):** Created `RestaurantRepository.java`, which uses the `LocationRepository` to get the user's position and then calls the Places API's `searchNearby` method to fetch a list of nearby restaurants, correctly deserializing the response into the app's `Restaurant` model.
