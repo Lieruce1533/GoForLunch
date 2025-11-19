@@ -24,6 +24,13 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        
+        // Read the API key from local.properties and expose it as a BuildConfig field
+        def localProperties = new Properties()
+        if (rootProject.file("local.properties").exists()) {
+            localProperties.load(rootProject.file("local.properties").newDataInputStream())
+        }
+        buildConfigField "String", "MAPS_API_KEY", "\"${localProperties.getProperty('MAPS_API_KEY', '')}\""
     }
 
     buildTypes {
@@ -54,14 +61,13 @@ dependencies {
     implementation libs.lifecycle.viewmodel.ktx
     implementation libs.lifecycle.livedata.ktx
 
-
     // Navigation
     implementation libs.navigation.fragment
     implementation libs.navigation.ui
 
-    // Location
+    // Location & Places
     implementation libs.play.services.location
-
+    implementation libs.places
 
     implementation libs.appcompat
     implementation libs.material
@@ -73,7 +79,6 @@ dependencies {
     implementation libs.credentials.play.services.auth
     implementation libs.googleid
     implementation libs.firebase.ui.auth
-    implementation libs.navigation.runtime
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
