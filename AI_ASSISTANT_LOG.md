@@ -111,3 +111,22 @@
     *   **Action (API Key):** Securely configured the Google Places API key by reading it from `local.properties` and exposing it to the app via `BuildConfig` and the `AndroidManifest.xml`.
     *   **Action (Model):** Created a `Restaurant.java` data model to represent a restaurant's data within the app.
     *   **Action (Repository):** Created `RestaurantRepository.java`, which uses the `LocationRepository` to get the user's position and then calls the Places API's `searchNearby` method to fetch a list of nearby restaurants, correctly deserializing the response into the app's `Restaurant` model.
+
+## Session: 2025-11-19
+
+### Summary of Work:
+
+*   **Places API Deprecation Update:** Updated the `RestaurantRepository` to fix deprecated Places API usage and ensure correct data fetching.
+    *   **Action:** Refactored `RestaurantRepository` to use `SearchNearbyRequest` and `FetchPlaceRequest`.
+    *   **Action:** Implemented a two-step fetching process:
+        1.  Search for nearby places (getting IDs).
+        2.  Fetch details for each place (ID, Name, Address, Rating, Photo Metadata, Location) in parallel.
+    *   **Action:** Corrected `Place.Field` usage (using `DISPLAY_NAME` and `FORMATTED_ADDRESS` as per newer API standards).
+    *   **Action:** Implemented `Tasks.whenAllSuccess` to wait for all detail fetches before updating the LiveData.
+    *   **Action:** Fixed a build error by replacing the deprecated `getLatLng()` method with `getLocation()` in `RestaurantRepository.java`, ensuring compatibility with the latest Places API client.
+
+*   **Location Permissions:** Verified that `LocationRepository` and `MainActivity` correctly handle runtime permissions for location updates.
+
+*   **Next Steps:**
+    *   Connect the `RestaurantRepository` to the `MapFragment` to display these restaurants on the map.
+    *   Implement the `RestaurantsFragment` (RecyclerView) to show the list of restaurants.

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.location.Location;
 import android.os.Looper;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 

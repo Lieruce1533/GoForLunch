@@ -3,6 +3,11 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
 }
 
+def localProperties = new Properties()
+if (rootProject.file("local.properties").exists()) {
+    localProperties.load(rootProject.file("local.properties").newDataInputStream())
+}
+
 android {
     namespace 'com.lieruce.goforlunch'
     compileSdk 36
@@ -25,11 +30,6 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         
-        // Read the API key from local.properties and expose it as a BuildConfig field
-        def localProperties = new Properties()
-        if (rootProject.file("local.properties").exists()) {
-            localProperties.load(rootProject.file("local.properties").newDataInputStream())
-        }
         buildConfigField "String", "MAPS_API_KEY", "\"${localProperties.getProperty('MAPS_API_KEY', '')}\""
     }
 
@@ -49,6 +49,7 @@ android {
     
     buildFeatures {
         viewBinding true
+        buildConfig true
     }
 }
 

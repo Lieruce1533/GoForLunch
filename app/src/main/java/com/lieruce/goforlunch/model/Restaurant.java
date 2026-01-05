@@ -10,16 +10,16 @@ public class Restaurant {
     private final String name;
     private final String address;
     private final double rating;
-    private final List<PhotoMetadata> photoMetadatas;
+    private final List<PhotoMetadata> photoMetadata;
     private final double latitude;
     private final double longitude;
 
-    public Restaurant(String id, String name, String address, double rating, List<PhotoMetadata> photoMetadatas, double latitude, double longitude) {
+    public Restaurant(String id, String name, String address, double rating, List<PhotoMetadata> photoMetadata, double latitude, double longitude) {
         this.id = id;
         this.name = name;
         this.address = address;
         this.rating = rating;
-        this.photoMetadatas = photoMetadatas;
+        this.photoMetadata = photoMetadata;
         this.latitude = latitude;
         this.longitude = longitude;
     }
@@ -29,7 +29,7 @@ public class Restaurant {
     public String getName() { return name; }
     public String getAddress() { return address; }
     public double getRating() { return rating; }
-    public List<PhotoMetadata> getPhotoMetadatas() { return photoMetadatas; }
+    public List<PhotoMetadata> getPhotoMetadatas() { return photoMetadata; }
     public double getLatitude() { return latitude; }
     public double getLongitude() { return longitude; }
 }
