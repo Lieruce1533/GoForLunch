@@ -64,3 +64,13 @@ This document summarizes the key technical discussions, troubleshooting steps, a
     - *Document ID*: `restaurant.place_id`
     - *Subcollection*: `attendees` (lists all users going to that restaurant).
     - *Denormalization*: The `attendees` documents will duplicate user `username` and `avatarUrl` for highly efficient queries, avoiding the need for multiple lookups.
+
+### 2.4. Location & Places Integration (Feature Branch: `feature/location-services`)
+
+- **Location Services**: Implemented `LocationRepository` using `FusedLocationProviderClient`.
+    - Handles runtime permissions (`ACCESS_FINE_LOCATION`).
+    - Exposes user location via `LiveData`.
+- **Restaurant Data**: Implemented `RestaurantRepository` using Google Places API.
+    - **API Update**: Updated to use the new Places API (`SearchNearbyRequest`, `FetchPlaceRequest`) to handle deprecations.
+    - **Strategy**: 2-step fetch (Search IDs -> Fetch Details in parallel) to get photos and ratings.
+    - **Data Flow**: `LocationRepository` -> User Location -> `RestaurantRepository` -> Nearby Restaurants.
