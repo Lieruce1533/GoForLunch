@@ -125,8 +125,18 @@
     *   **Action:** Implemented `Tasks.whenAllSuccess` to wait for all detail fetches before updating the LiveData.
     *   **Action:** Fixed a build error by replacing the deprecated `getLatLng()` method with `getLocation()` in `RestaurantRepository.java`, ensuring compatibility with the latest Places API client.
 
-*   **Location Permissions:** Verified that `LocationRepository` and `MainActivity` correctly handle runtime permissions for location updates.
+*   **Map Feature Implementation:** Connected the data layer to the UI to display the user's location and nearby restaurants on a Google Map.
+    *   **Action (Architecture):** Created `MapsViewModel` to bridge `LocationRepository` and `RestaurantRepository` with the UI.
+    *   **Action (Injection):** Updated `ViewModelFactory` to inject repositories into `MapsViewModel` and accept a `Context` for initialization.
+    *   **Action (UI):** Implemented `MapFragment` with Google Maps SDK. It now observes user location to center the camera and adds markers for nearby restaurants.
+    *   **Action (Optimization):** Refactored `LocationRepository` to use `getCurrentLocation` (single update) instead of `requestLocationUpdates` (continuous). This saves battery and prevents excessive/costly API calls to the Places API.
+    *   **Action (Dependencies):** Added `play-services-maps` to `build.gradle` and `libs.versions.toml`.
 
-*   **Next Steps:**
-    *   Connect the `RestaurantRepository` to the `MapFragment` to display these restaurants on the map.
-    *   Implement the `RestaurantsFragment` (RecyclerView) to show the list of restaurants.
+## Session: 2026-01-26
+
+### Summary of Work:
+
+*   **Reactive Restaurant Fetching:** Automated the data flow between location updates and restaurant discovery.
+    *   **Action (Repository):** Refactored `RestaurantRepository.fetchNearbyRestaurants()` to accept a `Location` parameter, allowing for explicit location-based searches.
+    *   **Action (ViewModel):** Updated `MapsViewModel` using `MediatorLiveData` to observe the user's location. When a valid location is received, it now automatically triggers `fetchNearbyRestaurants(location)` in the repository.
+    *   **Action (Architecture):** Improved the separation of concerns by ensuring the ViewModel manages the coordination between location updates and data fetching.

@@ -69,6 +69,7 @@ dependencies {
     // Location & Places
     implementation libs.play.services.location
     implementation libs.places
+    implementation libs.play.services.maps
 
     implementation libs.appcompat
     implementation libs.material
