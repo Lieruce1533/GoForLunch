@@ -3,16 +3,11 @@ package com.lieruce.goforlunch.repository;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
-import android.os.Looper;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 
@@ -21,7 +16,6 @@ public class LocationRepository {
     private static volatile LocationRepository instance;
     private final FusedLocationProviderClient fusedLocationProviderClient;
     private final MutableLiveData<Location> locationLiveData = new MutableLiveData<>();
-    private LocationCallback locationCallback;
 
     private LocationRepository(Context context) {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
@@ -44,32 +38,20 @@ public class LocationRepository {
 
     @SuppressLint("MissingPermission") // Permission is checked before calling this method
     public void startLocationUpdates() {
-        if (locationCallback == null) {
-            locationCallback = new LocationCallback() {
-                @Override
-                public void onLocationResult(LocationResult locationResult) {
-                    if (locationResult == null) {
-                        return;
-                    }
-                    for (Location location : locationResult.getLocations()) {
+        // We use getCurrentLocation for a single, high-accuracy update.
+        // This is battery efficient and prevents excessive API calls to Places.
+        // Handle failure if necessary (e.g., log it)
+        fusedLocationProviderClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+                .addOnSuccessListener(location -> {
+                    if (location != null) {
                         locationLiveData.setValue(location);
                     }
-                }
-            };
-
-            LocationRequest locationRequest = new LocationRequest.Builder(
-                    Priority.PRIORITY_HIGH_ACCURACY, 10000 // 10 seconds
-            ).build();
-
-            fusedLocationProviderClient.requestLocationUpdates(locationRequest,
-                    locationCallback, Looper.getMainLooper());
-        }
+                })
+                .addOnFailureListener(Throwable::printStackTrace);
     }
 
     public void stopLocationUpdates() {
-        if (locationCallback != null) {
-            fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-            locationCallback = null;
-        }
+        // No-op: We are not listening to updates anymore.
+        // Kept for interface compatibility if needed later.
     }
 }

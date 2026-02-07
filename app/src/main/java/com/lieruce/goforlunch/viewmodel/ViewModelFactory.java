@@ -1,10 +1,14 @@
 package com.lieruce.goforlunch.viewmodel;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.lieruce.goforlunch.repository.AuthRepository;
+import com.lieruce.goforlunch.repository.LocationRepository;
+import com.lieruce.goforlunch.repository.RestaurantRepository;
 import com.lieruce.goforlunch.repository.UserRepository;
 
 public class ViewModelFactory implements ViewModelProvider.Factory {
@@ -12,21 +16,25 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     private static volatile ViewModelFactory instance;
     private final AuthRepository authRepository;
     private final UserRepository userRepository;
+    private final LocationRepository locationRepository;
+    private final RestaurantRepository restaurantRepository;
 
-    public static ViewModelFactory getInstance() {
+    public static ViewModelFactory getInstance(Context context) {
         if (instance == null) {
             synchronized (ViewModelFactory.class) {
                 if (instance == null) {
-                    instance = new ViewModelFactory();
+                    instance = new ViewModelFactory(context.getApplicationContext());
                 }
             }
         }
         return instance;
     }
 
-    private ViewModelFactory() {
+    private ViewModelFactory(Context context) {
         this.authRepository = AuthRepository.getInstance();
         this.userRepository = UserRepository.getInstance();
+        this.locationRepository = LocationRepository.getInstance(context);
+        this.restaurantRepository = RestaurantRepository.getInstance(context);
     }
 
     @NonNull
@@ -35,6 +43,9 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(MainViewModel.class)) {
             return (T) new MainViewModel(authRepository, userRepository);
+        }
+        if (modelClass.isAssignableFrom(MapsViewModel.class)) {
+            return (T) new MapsViewModel(locationRepository, restaurantRepository);
         }
         throw new IllegalArgumentException("Unknown ViewModel class");
     }

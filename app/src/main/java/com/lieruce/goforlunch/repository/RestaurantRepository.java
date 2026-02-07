@@ -29,13 +29,11 @@ public class RestaurantRepository {
 
     private static volatile RestaurantRepository instance;
     private final PlacesClient placesClient;
-    private final LocationRepository locationRepository;
     private final MutableLiveData<List<Restaurant>> nearbyRestaurantsLiveData = new MutableLiveData<>();
 
     private RestaurantRepository(Context context) {
         Places.initializeWithNewPlacesApiEnabled(context, BuildConfig.MAPS_API_KEY);
         placesClient = Places.createClient(context);
-        locationRepository = LocationRepository.getInstance(context);
     }
 
     public static RestaurantRepository getInstance(Context context) {
@@ -53,14 +51,13 @@ public class RestaurantRepository {
         return nearbyRestaurantsLiveData;
     }
 
-    public void fetchNearbyRestaurants() {
-        Location lastKnownLocation = locationRepository.getLocationLiveData().getValue();
-        if (lastKnownLocation == null) {
-            return; // Can't fetch restaurants without a location
+    public void fetchNearbyRestaurants(Location location) {
+        if (location == null) {
+            return;
         }
 
         // Define the search area
-        LatLng center = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+        LatLng center = new LatLng(location.getLatitude(), location.getLongitude());
         double radiusInMeters = 1500;
         double latOffset = radiusInMeters / 111111.1;
         double lngOffset = radiusInMeters / (111111.1 * Math.cos(Math.toRadians(center.latitude)));
@@ -79,8 +76,14 @@ public class RestaurantRepository {
             // 2. For each minimal place, create a task to fetch its full details.
             for (Place minimalPlace : searchResponse.getPlaces()) {
                 if (minimalPlace.getId() != null) {
-                    // **FIXED**: Using the correct Place.Field constants you found.
-                    List<Place.Field> detailFields = Arrays.asList(Place.Field.ID, Place.Field.DISPLAY_NAME, Place.Field.FORMATTED_ADDRESS, Place.Field.LOCATION, Place.Field.RATING, Place.Field.PHOTO_METADATAS);
+                    List<Place.Field> detailFields = Arrays.asList(
+                            Place.Field.ID,
+                            Place.Field.DISPLAY_NAME,
+                            Place.Field.FORMATTED_ADDRESS,
+                            Place.Field.LOCATION,
+                            Place.Field.RATING,
+                            Place.Field.PHOTO_METADATAS
+                    );
                     FetchPlaceRequest fetchRequest = FetchPlaceRequest.newInstance(minimalPlace.getId(), detailFields);
                     fetchPlaceTasks.add(placesClient.fetchPlace(fetchRequest));
                 }
@@ -90,14 +93,13 @@ public class RestaurantRepository {
             Tasks.whenAllSuccess(fetchPlaceTasks).addOnSuccessListener(responses -> {
                 List<Restaurant> restaurants = new ArrayList<>();
                 for (Object response : responses) {
-                    // **FIXED**: Correctly casting the response and getting the Place object.
                     Place detailedPlace = ((FetchPlaceResponse) response).getPlace();
                     LatLng latLng = detailedPlace.getLocation();
                     if (latLng != null) {
                         Restaurant restaurant = new Restaurant(
                                 detailedPlace.getId(),
-                                detailedPlace.getDisplayName(),      // Correct getter is still getName()
-                                detailedPlace.getFormattedAddress(),   // Correct getter is still getAddress()
+                                detailedPlace.getDisplayName(),
+                                detailedPlace.getFormattedAddress(),
                                 detailedPlace.getRating() != null ? detailedPlace.getRating() : 0.0,
                                 detailedPlace.getPhotoMetadatas(),
                                 latLng.latitude,
