@@ -74,3 +74,19 @@ This document summarizes the key technical discussions, troubleshooting steps, a
     - **API Update**: Updated to use the new Places API (`SearchNearbyRequest`, `FetchPlaceRequest`) to handle deprecations.
     - **Strategy**: 2-step fetch (Search IDs -> Fetch Details in parallel) to get photos and ratings.
     - **Data Flow**: `LocationRepository` -> User Location -> `RestaurantRepository` -> Nearby Restaurants.
+
+### 2.5. Reactive Data Flow & Automated Search (Session: 2026-01-26)
+
+- **Problem**: Restaurant search had to be triggered manually, which was not a good user experience.
+- **The Reactive Solution**:
+    1.  **Refactored `RestaurantRepository`**: The `fetchNearbyRestaurants` method was changed to accept a `Location` object as a parameter, making it more explicit and easier to test.
+    2.  **`MapsViewModel` Enhancement**: We implemented a `MediatorLiveData` for the restaurant list. This mediator now "listens" to the user's location LiveData.
+    3.  **The Trigger**: As soon as the `LocationRepository` provides a valid location, the `MapsViewModel` automatically calls the repository's search function.
+    4.  **The Benefit**: The UI (Map) stays completely passive. It just observes the restaurant list, and the data flows automatically from GPS -> Repository -> ViewModel -> UI without manual intervention.
+
+## Part 3: Collaboration Ground Rules
+
+- **Agent Collaboration Rules (`AGENT_RULES.md`)**: To ensure a smooth working relationship, we established a set of rules for the AI Agent:
+    - **Rejection Protocol**: STOP and ask "why" if a change is rejected.
+    - **Educational Mandate**: Always explain the "why" and "how" of technical choices (Mentorship).
+    - **Accuracy**: Never guess dates or project states; always verify with the developer.

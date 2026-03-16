@@ -71,6 +71,9 @@ dependencies {
     implementation libs.places
     implementation libs.play.services.maps
 
+    // Image Loading
+    implementation libs.glide
+
     implementation libs.appcompat
     implementation libs.material
     implementation libs.activity
