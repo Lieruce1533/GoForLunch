@@ -1,0 +1,154 @@
+@startuml
+class com.lieruce.goforlunch.ui.workmates.WorkmatesFragment {
+- FragmentWorkmatesBinding binding
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
++ void onDestroyView()
+}
+
+
+class com.lieruce.goforlunch.model.User {
+- String uid
+- String username
+- String avatarUrl
++ String getUid()
++ String getUsername()
++ String getAvatarUrl()
++ void setUid(String)
++ void setUsername(String)
++ void setAvatarUrl(String)
+}
+
+
+class com.lieruce.goforlunch.repository.RestaurantRepository {
+- {static} RestaurantRepository instance
+- PlacesClient placesClient
+- MutableLiveData<List<Restaurant>> nearbyRestaurantsLiveData
++ {static} RestaurantRepository getInstance(Context)
++ LiveData<List<Restaurant>> getNearbyRestaurantsLiveData()
++ void fetchNearbyRestaurants(Location)
+}
+
+
+class com.lieruce.goforlunch.ui.restaurants.RestaurantsFragment {
+- FragmentRestaurantsBinding binding
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
++ void onDestroyView()
+}
+
+
+class com.lieruce.goforlunch.repository.AuthRepository {
+- FirebaseAuth firebaseAuth
+- {static} AuthRepository instance
++ {static} AuthRepository getInstance()
++ FirebaseUser getCurrentUser()
++ Task<Void> signOut(Context)
+}
+
+
+class com.lieruce.goforlunch.MainActivity {
+- MainViewModel viewModel
+- ActivityMainBinding binding
+- ActivityResultLauncher<Intent> signInLauncher
+- ActivityResultLauncher<String> requestPermissionLauncher
+# void onCreate(Bundle)
+- void setupNavigation()
+- void requestLocationPermission()
+- void startLocationUpdates()
+- void launchSignInFlow()
+- void onSignInResult(FirebaseAuthUIAuthenticationResult)
+- void showSnackBar(String)
+}
+
+
+class com.lieruce.goforlunch.viewmodel.MapsViewModel {
+- LocationRepository locationRepository
+- RestaurantRepository restaurantRepository
+- MediatorLiveData<List<Restaurant>> nearbyRestaurants
++ LiveData<Location> getUserLocation()
++ LiveData<List<Restaurant>> getNearbyRestaurants()
++ void refreshLocation()
+}
+
+
+class com.lieruce.goforlunch.ui.map.MapFragment {
+- FragmentMapBinding binding
+- MapsViewModel viewModel
+- GoogleMap googleMap
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
++ void onViewCreated(View,Bundle)
+- void setupMap()
+- void updateMapMarkers(List<Restaurant>)
++ void onDestroyView()
+}
+
+
+class com.lieruce.goforlunch.model.Restaurant {
+- String id
+- String name
+- String address
+- double rating
+- List<PhotoMetadata> photoMetadata
+- double latitude
+- double longitude
++ String getId()
++ String getName()
++ String getAddress()
++ double getRating()
++ List<PhotoMetadata> getPhotoMetadatas()
++ double getLatitude()
++ double getLongitude()
+}
+
+
+class com.lieruce.goforlunch.repository.LocationRepository {
+- {static} LocationRepository instance
+- FusedLocationProviderClient fusedLocationProviderClient
+- MutableLiveData<Location> locationLiveData
++ {static} LocationRepository getInstance(Context)
++ LiveData<Location> getLocationLiveData()
++ void startLocationUpdates()
++ void stopLocationUpdates()
+}
+
+
+class com.lieruce.goforlunch.viewmodel.ViewModelFactory {
+- {static} ViewModelFactory instance
+- AuthRepository authRepository
+- UserRepository userRepository
+- LocationRepository locationRepository
+- RestaurantRepository restaurantRepository
++ {static} ViewModelFactory getInstance(Context)
++ T create(Class<T>)
+}
+
+
+class com.lieruce.goforlunch.viewmodel.MainViewModel {
+- MutableLiveData<FirebaseUser> userLiveData
+- AuthRepository authRepository
+- UserRepository userRepository
++ LiveData<FirebaseUser> getUserLiveData()
++ void refreshUser()
++ Task<Void> signOut(Context)
++ Task<Void> createUser()
+}
+
+
+class com.lieruce.goforlunch.repository.UserRepository {
+- {static} String COLLECTION_NAME
+- {static} UserRepository instance
+- CollectionReference usersCollection
++ {static} UserRepository getInstance()
++ Task<Void> createUser(FirebaseUser)
+}
+
+
+
+
+androidx.fragment.app.Fragment <|-- com.lieruce.goforlunch.ui.workmates.WorkmatesFragment
+androidx.fragment.app.Fragment <|-- com.lieruce.goforlunch.ui.restaurants.RestaurantsFragment
+androidx.appcompat.app.AppCompatActivity <|-- com.lieruce.goforlunch.MainActivity
+androidx.lifecycle.ViewModel <|-- com.lieruce.goforlunch.viewmodel.MapsViewModel
+androidx.fragment.app.Fragment <|-- com.lieruce.goforlunch.ui.map.MapFragment
+com.lieruce.goforlunch.viewmodel.Factory <|.. com.lieruce.goforlunch.viewmodel.ViewModelFactory
+androidx.lifecycle.ViewModel <|-- com.lieruce.goforlunch.viewmodel.MainViewModel
+@enduml
