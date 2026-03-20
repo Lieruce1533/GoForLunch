@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -15,19 +16,22 @@ import com.lieruce.goforlunch.model.Restaurant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.RestaurantViewHolder> {
 
     private List<Restaurant> restaurants = new ArrayList<>();
     private Location userLocation;
 
-    public void setRestaurants(List<Restaurant> restaurants) {
-        this.restaurants = restaurants;
-        notifyDataSetChanged();
+    public void setRestaurants(List<Restaurant> newRestaurants) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new RestaurantDiffCallback(this.restaurants, newRestaurants));
+        this.restaurants = new ArrayList<>(newRestaurants);
+        diffResult.dispatchUpdatesTo(this);
     }
 
     public void setUserLocation(Location location) {
         this.userLocation = location;
+        // Since location affects every item's distance, we still need to refresh all
         notifyDataSetChanged();
     }
 
@@ -48,7 +52,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Re
         return restaurants.size();
     }
 
-    static class RestaurantViewHolder extends RecyclerView.ViewHolder {
+    public static class RestaurantViewHolder extends RecyclerView.ViewHolder {
         private final ItemRestaurantBinding binding;
 
         public RestaurantViewHolder(ItemRestaurantBinding binding) {
@@ -79,7 +83,6 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Re
             String photoUrl = null;
             if (restaurant.getPhotoMetadatas() != null && !restaurant.getPhotoMetadatas().isEmpty()) {
                 // Construction of the URL would normally happen here or in the repository.
-                // For now, we'll use a placeholder logic until the Repo provides the URL.
             }
 
             Glide.with(binding.restaurantPhoto.getContext())
@@ -88,8 +91,41 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Re
                     .error(R.drawable.ic_launcher_background)
                     .centerCrop()
                     .into(binding.restaurantPhoto);
+        }
+    }
 
-            // TODO: Bind hours and workmates count
+    private static class RestaurantDiffCallback extends DiffUtil.Callback {
+
+        private final List<Restaurant> oldList;
+        private final List<Restaurant> newList;
+
+        public RestaurantDiffCallback(List<Restaurant> oldList, List<Restaurant> newList) {
+            this.oldList = oldList;
+            this.newList = newList;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return oldList.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return newList.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return Objects.equals(oldList.get(oldItemPosition).getId(), newList.get(newItemPosition).getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            Restaurant oldItem = oldList.get(oldItemPosition);
+            Restaurant newItem = newList.get(newItemPosition);
+            return Objects.equals(oldItem.getName(), newItem.getName()) &&
+                    Objects.equals(oldItem.getAddress(), newItem.getAddress()) &&
+                    oldItem.getRating() == newItem.getRating();
         }
     }
 }
