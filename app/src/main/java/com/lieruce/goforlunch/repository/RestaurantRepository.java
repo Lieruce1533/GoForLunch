@@ -56,7 +56,6 @@ public class RestaurantRepository {
             return;
         }
 
-        // Define the search area
         LatLng center = new LatLng(location.getLatitude(), location.getLongitude());
         double radiusInMeters = 1500;
         double latOffset = radiusInMeters / 111111.1;
@@ -65,7 +64,6 @@ public class RestaurantRepository {
         LatLng northEast = new LatLng(center.latitude + latOffset, center.longitude + lngOffset);
         LocationRestriction locationRestriction = RectangularBounds.newInstance(southWest, northEast);
 
-        // 1. Search for nearby restaurants (minimal data).
         SearchNearbyRequest searchRequest = SearchNearbyRequest.builder(locationRestriction, Collections.singletonList(Place.Field.ID))
                 .setIncludedTypes(Collections.singletonList("restaurant"))
                 .build();
@@ -73,7 +71,6 @@ public class RestaurantRepository {
         placesClient.searchNearby(searchRequest).addOnSuccessListener(searchResponse -> {
             List<Task<FetchPlaceResponse>> fetchPlaceTasks = new ArrayList<>();
 
-            // 2. For each minimal place, create a task to fetch its full details.
             for (Place minimalPlace : searchResponse.getPlaces()) {
                 if (minimalPlace.getId() != null) {
                     List<Place.Field> detailFields = Arrays.asList(
@@ -82,20 +79,27 @@ public class RestaurantRepository {
                             Place.Field.FORMATTED_ADDRESS,
                             Place.Field.LOCATION,
                             Place.Field.RATING,
-                            Place.Field.PHOTO_METADATAS
+                            Place.Field.PHOTO_METADATAS,
+                            Place.Field.OPENING_HOURS,
+                            Place.Field.NATIONAL_PHONE_NUMBER, // Updated from PHONE_NUMBER
+                            Place.Field.WEBSITE_URI
                     );
                     FetchPlaceRequest fetchRequest = FetchPlaceRequest.newInstance(minimalPlace.getId(), detailFields);
                     fetchPlaceTasks.add(placesClient.fetchPlace(fetchRequest));
                 }
             }
 
-            // 3. Wait for all the detail-fetch tasks to complete.
             Tasks.whenAllSuccess(fetchPlaceTasks).addOnSuccessListener(responses -> {
                 List<Restaurant> restaurants = new ArrayList<>();
                 for (Object response : responses) {
                     Place detailedPlace = ((FetchPlaceResponse) response).getPlace();
                     LatLng latLng = detailedPlace.getLocation();
                     if (latLng != null) {
+                        String openingHours = "Opening info not available";
+                        if (detailedPlace.getOpeningHours() != null && !detailedPlace.getOpeningHours().getWeekdayText().isEmpty()) {
+                            openingHours = detailedPlace.getOpeningHours().getWeekdayText().get(0);
+                        }
+
                         Restaurant restaurant = new Restaurant(
                                 detailedPlace.getId(),
                                 detailedPlace.getDisplayName(),
@@ -103,7 +107,10 @@ public class RestaurantRepository {
                                 detailedPlace.getRating() != null ? detailedPlace.getRating() : 0.0,
                                 detailedPlace.getPhotoMetadatas(),
                                 latLng.latitude,
-                                latLng.longitude
+                                latLng.longitude,
+                                openingHours,
+                                detailedPlace.getNationalPhoneNumber(), // Updated getter
+                                detailedPlace.getWebsiteUri() != null ? detailedPlace.getWebsiteUri().toString() : null
                         );
                         restaurants.add(restaurant);
                     }

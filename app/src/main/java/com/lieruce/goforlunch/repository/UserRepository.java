@@ -4,8 +4,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.SetOptions;
 import com.lieruce.goforlunch.model.User;
+
+import java.util.List;
 
 public class UserRepository {
 
@@ -35,8 +38,16 @@ public class UserRepository {
 
         User userToCreate = new User(uid, username, avatarUrl);
 
-        // Use SetOptions.merge() to create the user if it doesn't exist,
-        // or update it if it does, without overwriting other fields.
         return usersCollection.document(uid).set(userToCreate, SetOptions.merge());
+    }
+
+    // Get all users who have selected a specific restaurant
+    public Query getUsersEatingAt(String restaurantId) {
+        return usersCollection.whereEqualTo("chosenRestaurantId", restaurantId);
+    }
+
+    // Get all users (for the Workmates list)
+    public Query getAllUsers() {
+        return usersCollection.orderBy("username", Query.Direction.ASCENDING);
     }
 }
