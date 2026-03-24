@@ -9,18 +9,36 @@
         android:id="@+id/navigation_map"
         android:name="com.lieruce.goforlunch.ui.map.MapFragment"
         android:label="Map"
-        tools:layout="@layout/fragment_map" />
+        tools:layout="@layout/fragment_map">
+        <action
+            android:id="@+id/action_navigation_map_to_restaurantDetailFragment"
+            app:destination="@id/restaurantDetailFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_restaurants"
         android:name="com.lieruce.goforlunch.ui.restaurants.RestaurantsFragment"
         android:label="Restaurants"
-        tools:layout="@layout/fragment_restaurants" />
+        tools:layout="@layout/fragment_restaurants">
+        <action
+            android:id="@+id/action_navigation_restaurants_to_restaurantDetailFragment"
+            app:destination="@id/restaurantDetailFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_workmates"
         android:name="com.lieruce.goforlunch.ui.workmates.WorkmatesFragment"
         android:label="Workmates"
         tools:layout="@layout/fragment_workmates" />
+
+    <fragment
+        android:id="@+id/restaurantDetailFragment"
+        android:name="com.lieruce.goforlunch.ui.restaurants.RestaurantDetailFragment"
+        android:label="Restaurant Detail"
+        tools:layout="@layout/fragment_restaurant_detail">
+        <argument
+            android:name="restaurantId"
+            app:argType="string" />
+    </fragment>
 
 </navigation>

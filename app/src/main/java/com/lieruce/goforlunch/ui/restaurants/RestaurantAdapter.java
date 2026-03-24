@@ -2,6 +2,7 @@ package com.lieruce.goforlunch.ui.restaurants;
 
 import android.location.Location;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -20,8 +21,17 @@ import java.util.Objects;
 
 public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.RestaurantViewHolder> {
 
+    public interface OnRestaurantClickListener {
+        void onRestaurantClick(Restaurant restaurant);
+    }
+
+    private final OnRestaurantClickListener listener;
     private List<Restaurant> restaurants = new ArrayList<>();
     private Location userLocation;
+
+    public RestaurantAdapter(OnRestaurantClickListener listener) {
+        this.listener = listener;
+    }
 
     public void setRestaurants(List<Restaurant> newRestaurants) {
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new RestaurantDiffCallback(this.restaurants, newRestaurants));
@@ -31,7 +41,6 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Re
 
     public void setUserLocation(Location location) {
         this.userLocation = location;
-        // Since location affects every item's distance, we still need to refresh all
         notifyDataSetChanged();
     }
 
@@ -44,7 +53,13 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Re
 
     @Override
     public void onBindViewHolder(@NonNull RestaurantViewHolder holder, int position) {
-        holder.bind(restaurants.get(position), userLocation);
+        Restaurant restaurant = restaurants.get(position);
+        holder.bind(restaurant, userLocation);
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onRestaurantClick(restaurant);
+            }
+        });
     }
 
     @Override
@@ -64,6 +79,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Re
             binding.restaurantName.setText(restaurant.getName());
             binding.restaurantAddress.setText(restaurant.getAddress());
             binding.restaurantRating.setRating((float) restaurant.getRating());
+            binding.restaurantHours.setText(restaurant.getOpeningHours());
 
             // --- Distance Calculation ---
             if (userLocation != null) {
@@ -79,16 +95,20 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Re
                 binding.restaurantDistance.setText("");
             }
 
-            // --- Photo Loading ---
-            String photoUrl = null;
-            if (restaurant.getPhotoMetadatas() != null && !restaurant.getPhotoMetadatas().isEmpty()) {
-                // Construction of the URL would normally happen here or in the repository.
+            // --- Workmates Count (Firestore) ---
+            if (restaurant.getWorkmatesCount() > 0) {
+                binding.workmatesCount.setVisibility(View.VISIBLE);
+                binding.iconWorkmates.setVisibility(View.VISIBLE);
+                binding.workmatesCount.setText(String.format(Locale.getDefault(), "(%d)", restaurant.getWorkmatesCount()));
+            } else {
+                binding.workmatesCount.setVisibility(View.GONE);
+                binding.iconWorkmates.setVisibility(View.GONE);
             }
 
+            // --- Photo Loading ---
+            // Placeholder: Photo loading logic to be implemented with Places API photo URLs
             Glide.with(binding.restaurantPhoto.getContext())
-                    .load(photoUrl)
-                    .placeholder(R.drawable.ic_launcher_background)
-                    .error(R.drawable.ic_launcher_background)
+                    .load(R.drawable.ic_launcher_background)
                     .centerCrop()
                     .into(binding.restaurantPhoto);
         }
@@ -125,7 +145,9 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Re
             Restaurant newItem = newList.get(newItemPosition);
             return Objects.equals(oldItem.getName(), newItem.getName()) &&
                     Objects.equals(oldItem.getAddress(), newItem.getAddress()) &&
-                    oldItem.getRating() == newItem.getRating();
+                    oldItem.getRating() == newItem.getRating() &&
+                    Objects.equals(oldItem.getOpeningHours(), newItem.getOpeningHours()) &&
+                    oldItem.getWorkmatesCount() == newItem.getWorkmatesCount();
         }
     }
 }

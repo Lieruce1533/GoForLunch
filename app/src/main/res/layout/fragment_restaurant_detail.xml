@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.restaurants.RestaurantDetailFragment">
+
+    <ImageView
+        android:id="@+id/detail_restaurant_photo"
+        android:layout_width="0dp"
+        android:layout_height="250dp"
+        android:contentDescription="@string/restaurant_image"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+    <View
+        android:id="@+id/info_container"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:background="?attr/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/detail_restaurant_photo" />
+
+    <TextView
+        android:id="@+id/detail_restaurant_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
+        android:textColor="@android:color/white"
+        app:layout_constraintEnd_toStartOf="@+id/detail_restaurant_rating"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/info_container"
+        tools:text="Restaurant Name" />
+
+    <TextView
+        android:id="@+id/detail_restaurant_address"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        android:textColor="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/detail_restaurant_name"
+        tools:text="123 Restaurant St, City" />
+
+    <RatingBar
+        android:id="@+id/detail_restaurant_rating"
+        style="@android:style/Widget.Material.RatingBar.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:isIndicator="true"
+        android:numStars="3"
+        android:progressTint="#FFD700"
+        android:stepSize="0.1"
+        app:layout_constraintBottom_toBottomOf="@+id/detail_restaurant_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/detail_restaurant_name"
+        tools:rating="2.5" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/detail_select_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:contentDescription="@string/select_restaurant"
+        app:layout_constraintBottom_toBottomOf="@+id/detail_restaurant_photo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/detail_restaurant_photo"
+        app:srcCompat="@android:drawable/checkbox_on_background" />
+
+    <LinearLayout
+        android:id="@+id/actions_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/info_container">
+
+        <Button
+            android:id="@+id/btn_call"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/call"
+            app:icon="@android:drawable/ic_menu_call"
+            app:iconGravity="top" />
+
+        <Button
+            android:id="@+id/btn_like"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/like"
+            app:icon="@android:drawable/btn_star_big_off"
+            app:iconGravity="top" />
+
+        <Button
+            android:id="@+id/btn_website"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/website"
+            app:icon="@android:drawable/ic_menu_view"
+            app:iconGravity="top" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/workmates_recycler_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/actions_container"
+        tools:listitem="@android:layout/simple_list_item_1" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

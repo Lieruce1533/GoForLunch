@@ -6,4 +6,8 @@
     <string name="restaurants_fragment">Restaurants List</string>
     <string name="restaurant_image">Restaurant image</string>
     <string name="workmates_image">Workmates icon</string>
+    <string name="select_restaurant">Select this restaurant</string>
+    <string name="call">Call</string>
+    <string name="like">Like</string>
+    <string name="website">Website</string>
 </resources>

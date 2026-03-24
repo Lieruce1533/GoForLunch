@@ -45,7 +45,10 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
             return (T) new MainViewModel(authRepository, userRepository);
         }
         if (modelClass.isAssignableFrom(MapsViewModel.class)) {
-            return (T) new MapsViewModel(locationRepository, restaurantRepository);
+            return (T) new MapsViewModel(locationRepository, restaurantRepository, userRepository);
+        }
+        if (modelClass.isAssignableFrom(RestaurantDetailViewModel.class)) {
+            return (T) new RestaurantDetailViewModel(restaurantRepository, userRepository);
         }
         throw new IllegalArgumentException("Unknown ViewModel class");
     }
