@@ -9,13 +9,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.lieruce.goforlunch.R;
 import com.lieruce.goforlunch.databinding.FragmentRestaurantsBinding;
+import com.lieruce.goforlunch.model.Restaurant;
 import com.lieruce.goforlunch.viewmodel.MapsViewModel;
 import com.lieruce.goforlunch.viewmodel.ViewModelFactory;
 
-public class RestaurantsFragment extends Fragment {
+public class RestaurantsFragment extends Fragment implements RestaurantAdapter.OnRestaurantClickListener {
 
     private FragmentRestaurantsBinding binding;
     private MapsViewModel mapsViewModel;
@@ -43,7 +46,7 @@ public class RestaurantsFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        adapter = new RestaurantAdapter();
+        adapter = new RestaurantAdapter(this);
         binding.restaurantRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.restaurantRecyclerView.setAdapter(adapter);
     }
@@ -62,6 +65,13 @@ public class RestaurantsFragment extends Fragment {
                 adapter.setRestaurants(restaurants);
             }
         });
+    }
+
+    @Override
+    public void onRestaurantClick(Restaurant restaurant) {
+        Bundle args = new Bundle();
+        args.putString("restaurantId", restaurant.getId());
+        Navigation.findNavController(requireView()).navigate(R.id.action_navigation_restaurants_to_restaurantDetailFragment, args);
     }
 
     @Override
