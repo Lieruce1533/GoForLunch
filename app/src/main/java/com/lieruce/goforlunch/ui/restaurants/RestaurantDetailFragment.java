@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
 import com.lieruce.goforlunch.R;
@@ -24,6 +25,7 @@ public class RestaurantDetailFragment extends Fragment {
 
     private FragmentRestaurantDetailBinding binding;
     private RestaurantDetailViewModel viewModel;
+    private WorkmateDetailAdapter workmateAdapter;
 
     @Nullable
     @Override
@@ -39,11 +41,12 @@ public class RestaurantDetailFragment extends Fragment {
         String restaurantId = getArguments() != null ? getArguments().getString("restaurantId") : null;
 
         setupViewModel();
+        setupRecyclerView();
         if (restaurantId != null) {
             viewModel.setRestaurantId(restaurantId);
         }
 
-        observeRestaurant();
+        observeData();
         setupClickListeners();
     }
 
@@ -52,10 +55,44 @@ public class RestaurantDetailFragment extends Fragment {
         viewModel = new ViewModelProvider(this, factory).get(RestaurantDetailViewModel.class);
     }
 
-    private void observeRestaurant() {
+    private void setupRecyclerView() {
+        workmateAdapter = new WorkmateDetailAdapter();
+        binding.workmatesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.workmatesRecyclerView.setAdapter(workmateAdapter);
+    }
+
+    private void observeData() {
+        // Observe restaurant details
         viewModel.getRestaurant().observe(getViewLifecycleOwner(), restaurant -> {
             if (restaurant != null) {
                 updateUI(restaurant);
+            }
+        });
+
+        // Observe selection state (The FAB)
+        viewModel.getIsRestaurantSelected().observe(getViewLifecycleOwner(), isSelected -> {
+            if (isSelected) {
+                binding.detail_select_fab.setImageResource(R.drawable.ic_check_circle);
+                binding.detail_select_fab.setColorFilter(getResources().getColor(android.R.color.holo_green_dark));
+            } else {
+                binding.detail_select_fab.setImageResource(android.R.drawable.checkbox_off_background);
+                binding.detail_select_fab.setColorFilter(null);
+            }
+        });
+
+        // Observe like state
+        viewModel.getIsRestaurantLiked().observe(getViewLifecycleOwner(), isLiked -> {
+            if (isLiked) {
+                binding.btn_like.setCompoundDrawablesWithIntrinsicBounds(0, android.R.drawable.btn_star_big_on, 0, 0);
+            } else {
+                binding.btn_like.setCompoundDrawablesWithIntrinsicBounds(0, android.R.drawable.btn_star_big_off, 0, 0);
+            }
+        });
+
+        // Observe workmates list
+        viewModel.getWorkmates().observe(getViewLifecycleOwner(), workmates -> {
+            if (workmates != null) {
+                workmateAdapter.setWorkmates(workmates);
             }
         });
     }
@@ -65,9 +102,9 @@ public class RestaurantDetailFragment extends Fragment {
         binding.detail_restaurant_address.setText(restaurant.getAddress());
         binding.detail_restaurant_rating.setRating((float) restaurant.getRating());
 
-        // Photo loading
+        // Photo loading logic (placeholder for now)
         Glide.with(this)
-                .load(R.drawable.ic_launcher_background) // Placeholder
+                .load(R.drawable.ic_launcher_background)
                 .centerCrop()
                 .into(binding.detail_restaurant_photo);
         
@@ -95,13 +132,8 @@ public class RestaurantDetailFragment extends Fragment {
     }
 
     private void setupClickListeners() {
-        binding.detail_select_fab.setOnClickListener(v -> {
-            // TODO: Call viewModel.toggleSelection()
-        });
-
-        binding.btn_like.setOnClickListener(v -> {
-            // TODO: Call viewModel.toggleLike()
-        });
+        binding.detail_select_fab.setOnClickListener(v -> viewModel.toggleSelection());
+        binding.btn_like.setOnClickListener(v -> viewModel.toggleLike());
     }
 
     @Override
