@@ -147,3 +147,31 @@
 
 *   **Session Start:** Commencing work on Phase 2 of the development plan.
 *   **Current Goal:** Implement the Restaurant List view using a RecyclerView.
+
+## Session: 2026-04-12
+
+### Summary of Work:
+
+*   **Restaurant List Implementation:** Built the foundational UI and logic for the restaurant list.
+    *   **Action (UI):** Created `fragment_restaurants.xml` with a `RecyclerView` and `item_restaurant.xml` for the list items.
+    *   **Action (Adapter):** Implemented `RestaurantAdapter.java` using **DiffUtil** for efficient list updates and **Glide** for image loading.
+    *   **Action (Logic):** Integrated distance calculation and basic opening hours display in the adapter.
+    *   **Action (ViewModel):** Refactored `RestaurantsFragment` to share the `MapsViewModel` with `MapFragment`, ensuring synchronized data.
+
+*   **Hybrid Data Merging:** Combined Google Places data with Firestore social data.
+    *   **Action (ViewModel):** Updated `MapsViewModel` to "enrich" restaurant data with a real-time workmates count fetched from Firestore using `addSnapshotListener`.
+    *   **Action (Repository):** Updated `UserRepository` with queries to count users eating at a specific restaurant.
+
+*   **Restaurant Detail Feature:** Built a comprehensive detail screen.
+    *   **Action (UI):** Created `fragment_restaurant_detail.xml` (photo header, FAB, action buttons, workmates list) and `item_workmate_detail.xml`.
+    *   **Action (Logic):** Implemented `RestaurantDetailViewModel.java` to handle restaurant details, user selection, and "likes" in Firestore.
+    *   **Action (Actions):** Implemented phone calling (`ACTION_DIAL`) and website browsing (`ACTION_VIEW`) via Intents.
+    *   **Action (Navigation):** Updated `nav_graph.xml` and implemented click listeners in `MapFragment` and `RestaurantsFragment` to navigate to the details screen using the `restaurantId` argument.
+    *   **Action (Firestore):** Implemented `toggleSelection()` and `toggleLike()` logic to allow users to choose their lunch spot and favorite restaurants.
+    *   **Action (Social):** Implemented `WorkmateDetailAdapter` to show a real-time list of coworkers joining a specific restaurant.
+
+*   **Code Quality & Maintenance:**
+    *   **Action:** Resolved visibility warnings in `RestaurantAdapter`.
+    *   **Action:** Fixed a constructor error in `RestaurantsFragment` by correctly passing the click listener.
+    *   **Action:** Updated `RestaurantRepository` to use the non-deprecated `NATIONAL_PHONE_NUMBER` field.
+    *   **Action:** Improved project stability by ensuring Fragments share ViewModels at the Activity level.
