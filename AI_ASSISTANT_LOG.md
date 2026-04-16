@@ -175,3 +175,20 @@
     *   **Action:** Fixed a constructor error in `RestaurantsFragment` by correctly passing the click listener.
     *   **Action:** Updated `RestaurantRepository` to use the non-deprecated `NATIONAL_PHONE_NUMBER` field.
     *   **Action:** Improved project stability by ensuring Fragments share ViewModels at the Activity level.
+
+## Session: 2026-04-15
+
+### Summary of Work:
+
+*   **Workmates Tab Implementation (Phase 3):** Built the global list of colleagues and their lunch choices.
+    *   **Action (UI):** Created `item_workmate.xml` for the RecyclerView rows.
+    *   **Action (ViewModel):** Created `WorkmatesViewModel.java` to observe the global list of users from Firestore in real-time.
+    *   **Action (Adapter):** Implemented `WorkmateAdapter.java` with dynamic status messages (e.g., "John Doe hasn't decided yet" vs. "John Doe is eating at...").
+    *   **Action (Fragment):** Updated `WorkmatesFragment.java` to display the list using the new adapter and ViewModel.
+    *   **Action (Factory):** Updated `ViewModelFactory.java` to support the creation of `WorkmatesViewModel`.
+
+## Session: 2026-04-16
+
+### Summary of Work:
+
+*   **Session Start:** Continuing the development of Go4Lunch. Today's goal is to refine existing features and potentially start on the Navigation Drawer and Search functionality.
