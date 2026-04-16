@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.lieruce.goforlunch.repository.AuthRepository;
 import com.lieruce.goforlunch.repository.UserRepository;
 
@@ -37,5 +38,13 @@ public class MainViewModel extends ViewModel {
 
     public Task<Void> createUser() {
         return userRepository.createUser(authRepository.getCurrentUser());
+    }
+
+    public Task<DocumentSnapshot> getCurrentUserData() {
+        FirebaseUser user = authRepository.getCurrentUser();
+        if (user != null) {
+            return userRepository.getUserData(user.getUid());
+        }
+        return null;
     }
 }

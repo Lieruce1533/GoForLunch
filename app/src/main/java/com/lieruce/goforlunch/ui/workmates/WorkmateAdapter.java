@@ -20,7 +20,16 @@ import java.util.Objects;
 
 public class WorkmateAdapter extends RecyclerView.Adapter<WorkmateAdapter.WorkmateViewHolder> {
 
+    public interface OnWorkmateClickListener {
+        void onWorkmateClick(User user);
+    }
+
+    private final OnWorkmateClickListener listener;
     private List<User> workmates = new ArrayList<>();
+
+    public WorkmateAdapter(OnWorkmateClickListener listener) {
+        this.listener = listener;
+    }
 
     public void setWorkmates(List<User> newWorkmates) {
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new WorkmateDiffCallback(this.workmates, newWorkmates));
@@ -37,7 +46,13 @@ public class WorkmateAdapter extends RecyclerView.Adapter<WorkmateAdapter.Workma
 
     @Override
     public void onBindViewHolder(@NonNull WorkmateViewHolder holder, int position) {
-        holder.bind(workmates.get(position));
+        User user = workmates.get(position);
+        holder.bind(user);
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onWorkmateClick(user);
+            }
+        });
     }
 
     @Override

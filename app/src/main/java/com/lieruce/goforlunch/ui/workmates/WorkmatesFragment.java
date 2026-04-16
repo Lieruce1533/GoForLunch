@@ -4,18 +4,22 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.lieruce.goforlunch.R;
 import com.lieruce.goforlunch.databinding.FragmentWorkmatesBinding;
+import com.lieruce.goforlunch.model.User;
 import com.lieruce.goforlunch.viewmodel.ViewModelFactory;
 import com.lieruce.goforlunch.viewmodel.WorkmatesViewModel;
 
-public class WorkmatesFragment extends Fragment {
+public class WorkmatesFragment extends Fragment implements WorkmateAdapter.OnWorkmateClickListener {
 
     private FragmentWorkmatesBinding binding;
     private WorkmatesViewModel viewModel;
@@ -43,7 +47,7 @@ public class WorkmatesFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        adapter = new WorkmateAdapter();
+        adapter = new WorkmateAdapter(this);
         binding.workmatesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.workmatesRecyclerView.setAdapter(adapter);
     }
@@ -54,6 +58,17 @@ public class WorkmatesFragment extends Fragment {
                 adapter.setWorkmates(workmates);
             }
         });
+    }
+
+    @Override
+    public void onWorkmateClick(User user) {
+        if (user.getChosenRestaurantId() != null) {
+            Bundle args = new Bundle();
+            args.putString("restaurantId", user.getChosenRestaurantId());
+            Navigation.findNavController(requireView()).navigate(R.id.restaurantDetailFragment, args);
+        } else {
+            Toast.makeText(requireContext(), user.getUsername() + " hasn't decided yet", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
