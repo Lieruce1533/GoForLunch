@@ -15,4 +15,5 @@
     <string name="logout">Logout</string>
     <string name="no_phone_number">No phone number available</string>
     <string name="no_website">No website available</string>
+    <string name="search">Search</string>
 </resources>
