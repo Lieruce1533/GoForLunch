@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private NavController navController;
     private AppBarConfiguration appBarConfiguration;
+    private MenuProvider currentMenuProvider;
 
     private final ActivityResultLauncher<Intent> signInLauncher =
             registerForActivityResult(new FirebaseAuthUIActivityResultContract(), this::onSignInResult);
@@ -71,11 +72,9 @@ public class MainActivity extends AppCompatActivity {
 
         ViewModelFactory factory = ViewModelFactory.getInstance(this);
         mainViewModel = new ViewModelProvider(this, factory).get(MainViewModel.class);
-        // We initialize mapsViewModel here at Activity level so it can be shared with Fragments
         mapsViewModel = new ViewModelProvider(this, factory).get(MapsViewModel.class);
 
         setupToolbar();
-        setupMenu();
 
         mainViewModel.getUserLiveData().observe(this, firebaseUser -> {
             if (firebaseUser != null) {
@@ -90,41 +89,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupToolbar() {
         setSupportActionBar(binding.toolbar);
-    }
-
-    private void setupMenu() {
-        addMenuProvider(new MenuProvider() {
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menuInflater.inflate(R.menu.options_menu, menu);
-                
-                MenuItem searchItem = menu.findItem(R.id.action_search);
-                SearchView searchView = (SearchView) searchItem.getActionView();
-                
-                if (searchView != null) {
-                    searchView.setQueryHint(getString(R.string.search));
-                    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                        @Override
-                        public boolean onQueryTextSubmit(String query) {
-                            mapsViewModel.setSearchQuery(query);
-                            return true;
-                        }
-
-                        @Override
-                        public boolean onQueryTextChange(String newText) {
-                            mapsViewModel.setSearchQuery(newText);
-                            return true;
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                // Handle other menu items if needed
-                return false;
-            }
-        });
     }
 
     private void setupNavigation() {
@@ -145,7 +109,59 @@ public class MainActivity extends AppCompatActivity {
             NavigationUI.setupWithNavController(binding.bottomNavigation, navController);
             NavigationUI.setupWithNavController(binding.navView, navController);
 
+            // Listen for destination changes to show/hide search bar
+            navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+                if (destination.getId() == R.id.navigation_map || destination.getId() == R.id.navigation_restaurants) {
+                    showSearchMenu();
+                } else {
+                    hideSearchMenu();
+                }
+            });
+
             setupDrawerContent();
+        }
+    }
+
+    private void showSearchMenu() {
+        if (currentMenuProvider == null) {
+            currentMenuProvider = new MenuProvider() {
+                @Override
+                public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                    menuInflater.inflate(R.menu.options_menu, menu);
+                    MenuItem searchItem = menu.findItem(R.id.action_search);
+                    SearchView searchView = (SearchView) searchItem.getActionView();
+                    if (searchView != null) {
+                        searchView.setQueryHint(getString(R.string.search));
+                        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                            @Override
+                            public boolean onQueryTextSubmit(String query) {
+                                mapsViewModel.setSearchQuery(query);
+                                return true;
+                            }
+                            @Override
+                            public boolean onQueryTextChange(String newText) {
+                                mapsViewModel.setSearchQuery(newText);
+                                return true;
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                    return false;
+                }
+            };
+            addMenuProvider(currentMenuProvider);
+        }
+    }
+
+    private void hideSearchMenu() {
+        if (currentMenuProvider != null) {
+            removeMenuProvider(currentMenuProvider);
+            currentMenuProvider = null;
+            // Clear search query when leaving searchable fragments
+            mapsViewModel.setSearchQuery("");
         }
     }
 
