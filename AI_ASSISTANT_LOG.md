@@ -191,4 +191,13 @@
 
 ### Summary of Work:
 
-*   **Session Start:** Continuing the development of Go4Lunch. Today's goal is to refine existing features and potentially start on the Navigation Drawer and Search functionality.
+*   **Navigation & UI Polish:**
+    *   **Action (Navigation Drawer):** Implemented a `DrawerLayout` with a `NavigationView` and a dynamic header (`nav_header_main.xml`).
+    *   **Action (MainActivity):** Updated `MainActivity.java` to handle drawer menu clicks, Logout flow, and the "Your Lunch" direct link feature.
+    *   **Action (Header):** Integrated **Glide** in the Activity to load the current user's Google profile info into the drawer header.
+    *   **Action (Workmate Navigation):** Updated `WorkmateAdapter` and `WorkmatesFragment` to allow clicking on a colleague's choice to navigate directly to that restaurant's details.
+
+*   **Search Functionality:**
+    *   **Action (UI):** Integrated a `SearchView` into the toolbar using the modern **MenuProvider** API.
+    *   **Action (ViewModel):** Implemented **Reactive Filtering** in `MapsViewModel` using `MediatorLiveData`. Typing in the search bar now filters both the Map markers and the Restaurant list locally.
+    *   **Action (Polish):** Implemented dynamic menu visibility. The search bar automatically hides when on the Workmates tab and reappears on the Map/List tabs.
