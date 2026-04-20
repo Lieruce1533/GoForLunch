@@ -4,15 +4,21 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.MenuProvider;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -29,6 +35,7 @@ import com.lieruce.goforlunch.databinding.ActivityMainBinding;
 import com.lieruce.goforlunch.model.User;
 import com.lieruce.goforlunch.repository.LocationRepository;
 import com.lieruce.goforlunch.viewmodel.MainViewModel;
+import com.lieruce.goforlunch.viewmodel.MapsViewModel;
 import com.lieruce.goforlunch.viewmodel.ViewModelFactory;
 
 import java.util.Arrays;
@@ -38,7 +45,8 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
-    private MainViewModel viewModel;
+    private MainViewModel mainViewModel;
+    private MapsViewModel mapsViewModel;
     private ActivityMainBinding binding;
     private NavController navController;
     private AppBarConfiguration appBarConfiguration;
@@ -61,11 +69,15 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        viewModel = new ViewModelProvider(this, ViewModelFactory.getInstance(this)).get(MainViewModel.class);
+        ViewModelFactory factory = ViewModelFactory.getInstance(this);
+        mainViewModel = new ViewModelProvider(this, factory).get(MainViewModel.class);
+        // We initialize mapsViewModel here at Activity level so it can be shared with Fragments
+        mapsViewModel = new ViewModelProvider(this, factory).get(MapsViewModel.class);
 
         setupToolbar();
+        setupMenu();
 
-        viewModel.getUserLiveData().observe(this, firebaseUser -> {
+        mainViewModel.getUserLiveData().observe(this, firebaseUser -> {
             if (firebaseUser != null) {
                 setupNavigation();
                 updateNavHeader();
@@ -78,6 +90,41 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupToolbar() {
         setSupportActionBar(binding.toolbar);
+    }
+
+    private void setupMenu() {
+        addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menuInflater.inflate(R.menu.options_menu, menu);
+                
+                MenuItem searchItem = menu.findItem(R.id.action_search);
+                SearchView searchView = (SearchView) searchItem.getActionView();
+                
+                if (searchView != null) {
+                    searchView.setQueryHint(getString(R.string.search));
+                    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                        @Override
+                        public boolean onQueryTextSubmit(String query) {
+                            mapsViewModel.setSearchQuery(query);
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onQueryTextChange(String newText) {
+                            mapsViewModel.setSearchQuery(newText);
+                            return true;
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                // Handle other menu items if needed
+                return false;
+            }
+        });
     }
 
     private void setupNavigation() {
@@ -106,8 +153,8 @@ public class MainActivity extends AppCompatActivity {
         binding.navView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_logout) {
-                viewModel.signOut(this).addOnSuccessListener(aVoid -> {
-                    viewModel.refreshUser();
+                mainViewModel.signOut(this).addOnSuccessListener(aVoid -> {
+                    mainViewModel.refreshUser();
                 });
             } else if (id == R.id.nav_your_lunch) {
                 navigateToYourLunch();
@@ -120,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void navigateToYourLunch() {
-        viewModel.getCurrentUserData().addOnSuccessListener(documentSnapshot -> {
+        mainViewModel.getCurrentUserData().addOnSuccessListener(documentSnapshot -> {
             User user = documentSnapshot.toObject(User.class);
             if (user != null && user.getChosenRestaurantId() != null) {
                 Bundle args = new Bundle();
@@ -138,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
         TextView nameView = headerView.findViewById(R.id.nav_header_name);
         TextView emailView = headerView.findViewById(R.id.nav_header_email);
 
-        viewModel.getUserLiveData().observe(this, firebaseUser -> {
+        mainViewModel.getUserLiveData().observe(this, firebaseUser -> {
             if (firebaseUser != null) {
                 nameView.setText(firebaseUser.getDisplayName());
                 emailView.setText(firebaseUser.getEmail());
@@ -182,8 +229,8 @@ public class MainActivity extends AppCompatActivity {
     private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
-            viewModel.refreshUser();
-            viewModel.createUser().addOnSuccessListener(aVoid -> {
+            mainViewModel.refreshUser();
+            mainViewModel.createUser().addOnSuccessListener(aVoid -> {
                 showSnackBar("User data synced with Firestore!");
             }).addOnFailureListener(e -> {
                 showSnackBar("Error syncing user data with Firestore.");
