@@ -24,7 +24,7 @@ productive but also educational and architecturally sound.
     the app.
 *   **Architectural Integrity**: The Agent must prioritize a clean, modern 
     Android architecture (MVVM, Repository pattern, Dependency Injection, etc.) 
-    and explain how each part fits into this vision.
+    and explain how each part fits into this vision.(read `APP_ARCHITECTURE_PLAN.md` and after that `ARCHITECTURAL_SHIFTS.md`)
 
 ## 3. Project Management & Accuracy
 *   **Session Logs**: The Agent must maintain the `AI_ASSISTANT_LOG.md` 

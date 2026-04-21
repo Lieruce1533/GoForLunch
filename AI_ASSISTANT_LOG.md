@@ -138,7 +138,7 @@
 
 *   **Reactive Restaurant Fetching:** Automated the data flow between location updates and restaurant discovery.
     *   **Action (Repository):** Refactored `RestaurantRepository.fetchNearbyRestaurants()` to accept a `Location` parameter, allowing for explicit location-based searches.
-    *   **Action (ViewModel):** Updated `MapsViewModel` using `MediatorLiveData` to observe the user's location. When a valid location is received, it now automatically triggers `fetchNearbyRestaurants(location)` in the repository.
+    *   **Action (ViewModel):** Updated `MapsViewModel` using `MediatorLiveData` to observe the user's location. When a value is received, it now automatically triggers `fetchNearbyRestaurants(location)` in the repository.
     *   **Action (Architecture):** Improved the separation of concerns by ensuring the ViewModel manages the coordination between location updates and data fetching.
 
 ## Session: 2026-03-15
@@ -201,3 +201,10 @@
     *   **Action (UI):** Integrated a `SearchView` into the toolbar using the modern **MenuProvider** API.
     *   **Action (ViewModel):** Implemented **Reactive Filtering** in `MapsViewModel` using `MediatorLiveData`. Typing in the search bar now filters both the Map markers and the Restaurant list locally.
     *   **Action (Polish):** Implemented dynamic menu visibility. The search bar automatically hides when on the Workmates tab and reappears on the Map/List tabs.
+
+## Session: 2026-04-21
+
+### Summary of Work:
+
+*   **Session Start:** Commencing work on the next steps proposed in the previous session.
+*   **Current Goal:** Implement the logic to fetch real restaurant photos from the Google Places API and refine the "Opening Hours" display.
