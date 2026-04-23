@@ -72,20 +72,20 @@ public class RestaurantDetailFragment extends Fragment {
         // Observe selection state (The FAB)
         viewModel.getIsRestaurantSelected().observe(getViewLifecycleOwner(), isSelected -> {
             if (isSelected) {
-                binding.detail_select_fab.setImageResource(R.drawable.ic_check_circle);
-                binding.detail_select_fab.setColorFilter(getResources().getColor(android.R.color.holo_green_dark));
+                binding.detailSelectFab.setImageResource(R.drawable.ic_check_circle);
+                binding.detailSelectFab.setColorFilter(getResources().getColor(android.R.color.holo_green_dark));
             } else {
-                binding.detail_select_fab.setImageResource(android.R.drawable.checkbox_off_background);
-                binding.detail_select_fab.setColorFilter(null);
+                binding.detailSelectFab.setImageResource(android.R.drawable.checkbox_off_background);
+                binding.detailSelectFab.setColorFilter(null);
             }
         });
 
         // Observe like state
         viewModel.getIsRestaurantLiked().observe(getViewLifecycleOwner(), isLiked -> {
             if (isLiked) {
-                binding.btn_like.setCompoundDrawablesWithIntrinsicBounds(0, android.R.drawable.btn_star_big_on, 0, 0);
+                binding.btnLike.setCompoundDrawablesWithIntrinsicBounds(0, android.R.drawable.btn_star_big_on, 0, 0);
             } else {
-                binding.btn_like.setCompoundDrawablesWithIntrinsicBounds(0, android.R.drawable.btn_star_big_off, 0, 0);
+                binding.btnLike.setCompoundDrawablesWithIntrinsicBounds(0, android.R.drawable.btn_star_big_off, 0, 0);
             }
         });
 
@@ -98,18 +98,20 @@ public class RestaurantDetailFragment extends Fragment {
     }
 
     private void updateUI(Restaurant restaurant) {
-        binding.detail_restaurant_name.setText(restaurant.getName());
-        binding.detail_restaurant_address.setText(restaurant.getAddress());
-        binding.detail_restaurant_rating.setRating((float) restaurant.getRating());
+        binding.detailRestaurantName.setText(restaurant.getName());
+        binding.detailRestaurantAddress.setText(restaurant.getAddress());
+        binding.detailRestaurantRating.setRating((float) restaurant.getRating());
 
-        // Photo loading logic (placeholder for now)
+        // Photo loading
         Glide.with(this)
-                .load(R.drawable.ic_launcher_background)
+                .load(restaurant.getPhotoUrl())
+                .placeholder(R.drawable.ic_launcher_background)
+                .error(R.drawable.ic_launcher_background)
                 .centerCrop()
-                .into(binding.detail_restaurant_photo);
+                .into(binding.detailRestaurantPhoto);
         
         // Setup Call button
-        binding.btn_call.setOnClickListener(v -> {
+        binding.btnCall.setOnClickListener(v -> {
             if (restaurant.getPhoneNumber() != null) {
                 Intent intent = new Intent(Intent.ACTION_DIAL);
                 intent.setData(Uri.parse("tel:" + restaurant.getPhoneNumber()));
@@ -120,7 +122,7 @@ public class RestaurantDetailFragment extends Fragment {
         });
 
         // Setup Website button
-        binding.btn_website.setOnClickListener(v -> {
+        binding.btnWebsite.setOnClickListener(v -> {
             if (restaurant.getWebsiteUrl() != null) {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse(restaurant.getWebsiteUrl()));
@@ -132,8 +134,8 @@ public class RestaurantDetailFragment extends Fragment {
     }
 
     private void setupClickListeners() {
-        binding.detail_select_fab.setOnClickListener(v -> viewModel.toggleSelection());
-        binding.btn_like.setOnClickListener(v -> viewModel.toggleLike());
+        binding.detailSelectFab.setOnClickListener(v -> viewModel.toggleSelection());
+        binding.btnLike.setOnClickListener(v -> viewModel.toggleLike());
     }
 
     @Override

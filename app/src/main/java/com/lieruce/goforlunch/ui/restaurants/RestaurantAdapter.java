@@ -106,9 +106,10 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Re
             }
 
             // --- Photo Loading ---
-            // Placeholder: Photo loading logic to be implemented with Places API photo URLs
             Glide.with(binding.restaurantPhoto.getContext())
-                    .load(R.drawable.ic_launcher_background)
+                    .load(restaurant.getPhotoUrl())
+                    .placeholder(R.drawable.ic_launcher_background)
+                    .error(R.drawable.ic_launcher_background)
                     .centerCrop()
                     .into(binding.restaurantPhoto);
         }
@@ -147,7 +148,8 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Re
                     Objects.equals(oldItem.getAddress(), newItem.getAddress()) &&
                     oldItem.getRating() == newItem.getRating() &&
                     Objects.equals(oldItem.getOpeningHours(), newItem.getOpeningHours()) &&
-                    oldItem.getWorkmatesCount() == newItem.getWorkmatesCount();
+                    oldItem.getWorkmatesCount() == newItem.getWorkmatesCount() &&
+                    Objects.equals(oldItem.getPhotoUrl(), newItem.getPhotoUrl());
         }
     }
 }
