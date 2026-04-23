@@ -30,7 +30,9 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         
-        buildConfigField "String", "MAPS_API_KEY", "\"${localProperties.getProperty('MAPS_API_KEY', '')}\""
+        def mapsApiKey = localProperties.getProperty('MAPS_API_KEY', '').replace('"', '')
+        buildConfigField "String", "MAPS_API_KEY", "\"${mapsApiKey}\""
+        manifestPlaceholders = [MAPS_API_KEY: mapsApiKey]
     }
 
     buildTypes {
@@ -68,6 +70,7 @@ dependencies {
 
     // Location & Places
     implementation libs.play.services.location
+    implementation libs.play.services.auth
     implementation libs.places
     implementation libs.play.services.maps
 

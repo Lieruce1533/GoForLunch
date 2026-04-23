@@ -202,9 +202,33 @@
     *   **Action (ViewModel):** Implemented **Reactive Filtering** in `MapsViewModel` using `MediatorLiveData`. Typing in the search bar now filters both the Map markers and the Restaurant list locally.
     *   **Action (Polish):** Implemented dynamic menu visibility. The search bar automatically hides when on the Workmates tab and reappears on the Map/List tabs.
 
-## Session: 2026-04-21
+## Session: 2026-04-22
 
 ### Summary of Work:
 
-*   **Session Start:** Commencing work on the next steps proposed in the previous session.
-*   **Current Goal:** Implement the logic to fetch real restaurant photos from the Google Places API and refine the "Opening Hours" display.
+*   **Real Restaurant Photos Implementation:**
+    *   **Action (Model):** Expanded `Restaurant.java` with a `photoUrl` field to support dynamic image loading.
+    *   **Action (Repository):** Updated `RestaurantRepository.java` to fetch **resolved Photo URIs** using the Google Places SDK (`fetchResolvedPhotoUri`). Implemented parallel fetching for performance.
+    *   **Action (UI):** Updated `RestaurantAdapter` and `RestaurantDetailFragment` to load real photos using **Glide**, replacing placeholders.
+
+*   **Opening Hours Refinement:**
+    *   **Action (Logic):** Improved `RestaurantRepository` to determine the current day of the week using `Calendar` and extract the appropriate opening string from `weekdayText`.
+    *   **Action (Status):** Integrated `BusinessStatus` checks to handle closed or non-operational restaurants.
+
+## Session: 2026-04-23
+
+### Summary of Work:
+
+*   **Bug Fix - Application Crash at Startup:**
+    *   **Action (Theme):** Resolved an `IllegalStateException` by updating `themes.xml` (day and night) to use `NoActionBar` variants. This avoids conflicts when setting a custom Toolbar as the SupportActionBar.
+    *   **Action (Dependencies):** Resolved a `NoClassDefFoundError` by adding `com.google.android.gms:play-services-auth` to the project. This was required for the Firebase UI login flow.
+    *   **Action (Code Safety):** Added explicit runtime permission checks in `MapFragment.setupMap()` to prevent crashes when accessing location features before permission is granted.
+
+*   **Build & Configuration Polish:**
+    *   **Action (API Key Injection):** Refactored `app/build.gradle` to strip quotes from `local.properties` values and correctly inject the `MAPS_API_KEY` into both `BuildConfig` and `AndroidManifest.xml` via `manifestPlaceholders`.
+    *   **Action (Library Updates):** Updated `firebase-ui-auth` to version `9.1.1` and added `play-services-auth` version `21.5.1` for better compatibility.
+
+*   **Documentation:**
+    *   **Action:** Created `GOOGLE_CLOUD_SETUP_GUIDE.md` to help the developer fix their Google Cloud billing and API key issues.
+
+*   **Current Status:** The app now launches successfully and reaches the login screen. The map is currently empty due to an invalid/fake API key.

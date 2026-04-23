@@ -16,9 +16,10 @@ public class Restaurant {
     private final String openingHours;
     private final String phoneNumber;
     private final String websiteUrl;
+    private final String photoUrl;
     private int workmatesCount;
 
-    public Restaurant(String id, String name, String address, double rating, List<PhotoMetadata> photoMetadata, double latitude, double longitude, String openingHours, String phoneNumber, String websiteUrl) {
+    public Restaurant(String id, String name, String address, double rating, List<PhotoMetadata> photoMetadata, double latitude, double longitude, String openingHours, String phoneNumber, String websiteUrl, String photoUrl) {
         this.id = id;
         this.name = name;
         this.address = address;
@@ -29,6 +30,7 @@ public class Restaurant {
         this.openingHours = openingHours;
         this.phoneNumber = phoneNumber;
         this.websiteUrl = websiteUrl;
+        this.photoUrl = photoUrl;
         this.workmatesCount = 0;
     }
 
@@ -43,6 +45,7 @@ public class Restaurant {
     public String getOpeningHours() { return openingHours; }
     public String getPhoneNumber() { return phoneNumber; }
     public String getWebsiteUrl() { return websiteUrl; }
+    public String getPhotoUrl() { return photoUrl; }
     public int getWorkmatesCount() { return workmatesCount; }
 
     // --- SETTERS ---
