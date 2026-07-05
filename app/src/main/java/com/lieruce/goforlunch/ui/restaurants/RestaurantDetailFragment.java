@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.button.MaterialButton;
 import com.lieruce.goforlunch.R;
 import com.lieruce.goforlunch.databinding.FragmentRestaurantDetailBinding;
 import com.lieruce.goforlunch.model.Restaurant;
@@ -72,20 +73,23 @@ public class RestaurantDetailFragment extends Fragment {
         // Observe selection state (The FAB)
         viewModel.getIsRestaurantSelected().observe(getViewLifecycleOwner(), isSelected -> {
             if (isSelected) {
-                binding.detailSelectFab.setImageResource(R.drawable.ic_check_circle);
-                binding.detailSelectFab.setColorFilter(getResources().getColor(android.R.color.holo_green_dark));
+                binding.detailSelectFab.setText(R.string.cancel_choice);
+                binding.detailSelectFab.setIconResource(R.drawable.ic_check_circle);
+                binding.detailSelectFab.setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
             } else {
-                binding.detailSelectFab.setImageResource(android.R.drawable.checkbox_off_background);
-                binding.detailSelectFab.setColorFilter(null);
+                binding.detailSelectFab.setText(R.string.pick_this_restaurant);
+                binding.detailSelectFab.setIconResource(android.R.drawable.checkbox_off_background);
+                binding.detailSelectFab.setBackgroundColor(getResources().getColor(android.R.color.holo_green_dark));
             }
         });
 
         // Observe like state
         viewModel.getIsRestaurantLiked().observe(getViewLifecycleOwner(), isLiked -> {
+            MaterialButton btnLike = (MaterialButton) binding.btnLike;
             if (isLiked) {
-                binding.btnLike.setCompoundDrawablesWithIntrinsicBounds(0, android.R.drawable.btn_star_big_on, 0, 0);
+                btnLike.setIconResource(android.R.drawable.btn_star_big_on);
             } else {
-                binding.btnLike.setCompoundDrawablesWithIntrinsicBounds(0, android.R.drawable.btn_star_big_off, 0, 0);
+                btnLike.setIconResource(android.R.drawable.btn_star_big_off);
             }
         });
 
@@ -100,7 +104,10 @@ public class RestaurantDetailFragment extends Fragment {
     private void updateUI(Restaurant restaurant) {
         binding.detailRestaurantName.setText(restaurant.getName());
         binding.detailRestaurantAddress.setText(restaurant.getAddress());
-        binding.detailRestaurantRating.setRating((float) restaurant.getRating());
+        
+        // Normalize Google Rating (0-5) to App Stars (0-3)
+        float normalizedRating = (float) (restaurant.getRating() * 3.0 / 5.0);
+        binding.detailRestaurantRating.setRating(normalizedRating);
 
         // Photo loading
         Glide.with(this)
@@ -134,8 +141,14 @@ public class RestaurantDetailFragment extends Fragment {
     }
 
     private void setupClickListeners() {
-        binding.detailSelectFab.setOnClickListener(v -> viewModel.toggleSelection());
-        binding.btnLike.setOnClickListener(v -> viewModel.toggleLike());
+        binding.detailSelectFab.setOnClickListener(v -> {
+            viewModel.toggleSelection();
+            Toast.makeText(requireContext(), R.string.selection_updated, Toast.LENGTH_SHORT).show();
+        });
+        binding.btnLike.setOnClickListener(v -> {
+            viewModel.toggleLike();
+            Toast.makeText(requireContext(), R.string.likes_updated, Toast.LENGTH_SHORT).show();
+        });
     }
 
     @Override

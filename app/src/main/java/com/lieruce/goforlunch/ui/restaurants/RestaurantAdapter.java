@@ -78,7 +78,11 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Re
         public void bind(Restaurant restaurant, Location userLocation) {
             binding.restaurantName.setText(restaurant.getName());
             binding.restaurantAddress.setText(restaurant.getAddress());
-            binding.restaurantRating.setRating((float) restaurant.getRating());
+            
+            // Normalize Google Rating (0-5) to App Stars (0-3)
+            float normalizedRating = (float) (restaurant.getRating() * 3.0 / 5.0);
+            binding.restaurantRating.setRating(normalizedRating);
+
             binding.restaurantHours.setText(restaurant.getOpeningHours());
 
             // --- Distance Calculation ---

@@ -35,13 +35,17 @@ public class MapsViewModel extends ViewModel {
         // 1. Automatically trigger restaurant fetch from Google when location changes
         nearbyRestaurants.addSource(locationRepository.getLocationLiveData(), location -> {
             if (location != null) {
+                android.util.Log.d("MapsViewModel", "Location received: " + location.getLatitude() + ", " + location.getLongitude());
                 restaurantRepository.fetchNearbyRestaurants(location);
+            } else {
+                android.util.Log.d("MapsViewModel", "Location is null");
             }
         });
 
         // 2. When Google returns restaurants, enrich them with Firestore data
         nearbyRestaurants.addSource(restaurantRepository.getNearbyRestaurantsLiveData(), restaurants -> {
             if (restaurants != null) {
+                nearbyRestaurants.setValue(restaurants);
                 enrichRestaurantsWithWorkmates(restaurants);
             }
         });

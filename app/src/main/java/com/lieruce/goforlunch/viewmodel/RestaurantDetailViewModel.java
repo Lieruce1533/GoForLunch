@@ -76,16 +76,16 @@ public class RestaurantDetailViewModel extends ViewModel {
         Restaurant restaurant = restaurantLiveData.getValue();
         Boolean currentlySelected = isRestaurantSelected.getValue();
 
-        if (currentUser != null && restaurant != null && currentlySelected != null) {
-            if (currentlySelected) {
+        if (currentUser != null && restaurant != null) {
+            boolean newValue = (currentlySelected == null) || !currentlySelected;
+            if (!newValue) {
                 // Deselect: Clear the choice
                 userRepository.updateChosenRestaurant(currentUser.getUid(), null, null);
-                isRestaurantSelected.setValue(false);
             } else {
                 // Select: Set the choice
                 userRepository.updateChosenRestaurant(currentUser.getUid(), restaurant.getId(), restaurant.getName());
-                isRestaurantSelected.setValue(true);
             }
+            isRestaurantSelected.setValue(newValue);
         }
     }
 
@@ -94,8 +94,8 @@ public class RestaurantDetailViewModel extends ViewModel {
         Restaurant restaurant = restaurantLiveData.getValue();
         Boolean currentlyLiked = isRestaurantLiked.getValue();
 
-        if (currentUser != null && restaurant != null && currentlyLiked != null) {
-            boolean newLikeStatus = !currentlyLiked;
+        if (currentUser != null && restaurant != null) {
+            boolean newLikeStatus = (currentlyLiked == null) || !currentlyLiked;
             userRepository.updateLikedRestaurant(currentUser.getUid(), restaurant.getId(), newLikeStatus);
             isRestaurantLiked.setValue(newLikeStatus);
         }

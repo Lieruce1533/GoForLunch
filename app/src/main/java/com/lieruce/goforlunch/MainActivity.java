@@ -75,10 +75,10 @@ public class MainActivity extends AppCompatActivity {
         mapsViewModel = new ViewModelProvider(this, factory).get(MapsViewModel.class);
 
         setupToolbar();
+        setupNavigation(); // Initialize navigation once here
 
         mainViewModel.getUserLiveData().observe(this, firebaseUser -> {
             if (firebaseUser != null) {
-                setupNavigation();
                 updateNavHeader();
                 requestLocationPermission();
             } else {
@@ -92,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupNavigation() {
+        if (navController != null) return; // Prevent multiple initializations
+
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         if (navHostFragment != null) {
             navController = navHostFragment.getNavController();
@@ -222,7 +224,8 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             startLocationUpdates();
         } else {
-            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+            // Using post to ensure activity is in a valid state to show the permission dialog
+            binding.getRoot().post(() -> requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION));
         }
     }
 

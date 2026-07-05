@@ -16,4 +16,10 @@
     <string name="no_phone_number">No phone number available</string>
     <string name="no_website">No website available</string>
     <string name="search">Search</string>
+    <string name="no_restaurants_found">No restaurants found in this area.</string>
+    <string name="searching">Searching for restaurants...</string>
+    <string name="selection_updated">Selection updated!</string>
+    <string name="likes_updated">Likes updated!</string>
+    <string name="pick_this_restaurant">I\'m eating here</string>
+    <string name="cancel_choice">I changed my mind</string>
 </resources>
