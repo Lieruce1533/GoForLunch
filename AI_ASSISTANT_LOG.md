@@ -232,3 +232,20 @@
     *   **Action:** Created `GOOGLE_CLOUD_SETUP_GUIDE.md` to help the developer fix their Google Cloud billing and API key issues.
 
 *   **Current Status:** The app now launches successfully and reaches the login screen. The map is currently empty due to an invalid/fake API key.
+
+## Session: 2026-05-02
+
+### Summary of Work:
+
+*   **Bug Fixes & Robustness:**
+    *   **Action (Places API):** Fixed a crash by switching from `RectangularBounds` to `CircularBounds` as required by the new Places SDK.
+    *   **Action (Data Flow):** Updated `RestaurantRepository` and `MapsViewModel` to show restaurants immediately upon loading from Google, rather than waiting for Firestore enrichment. This fixed the "empty list" issue.
+    *   **Action (Search):** Broadened search types to include cafes, bakeries, and bars, and removed the unsupported "food" type.
+
+*   **UI/UX Improvements:**
+    *   **Action (Map):** Adjusted zoom level to `13.5f` to better visualize the 1.5km search radius.
+    *   **Action (Ratings):** Implemented normalization logic to convert Google's 5-star rating to our app's 3-star UI.
+    *   **Action (Interactions):** Fixed the "Like" button logic in `RestaurantDetailViewModel` and added Toast feedback for selection/like actions.
+    *   **Action (Empty States):** Added a loading spinner and a "No results" message to the restaurant list.
+
+*   **Status:** The app is now functional on physical devices with real data loading on both Map and List views.

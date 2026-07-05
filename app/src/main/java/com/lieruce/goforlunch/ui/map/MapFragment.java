@@ -34,6 +34,7 @@ public class MapFragment extends Fragment {
     private FragmentMapBinding binding;
     private MapsViewModel viewModel;
     private GoogleMap googleMap;
+    private boolean isInitialLocationSet = false;
 
     @Nullable
     @Override
@@ -71,9 +72,10 @@ public class MapFragment extends Fragment {
 
         // Observe User Location
         viewModel.getUserLocation().observe(getViewLifecycleOwner(), location -> {
-            if (location != null) {
+            if (location != null && !isInitialLocationSet) {
                 LatLng userLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 15f));
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 13f));
+                isInitialLocationSet = true;
             }
         });
 

@@ -2,6 +2,7 @@ package com.lieruce.goforlunch.repository;
 
 import android.content.Context;
 import android.location.Location;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -10,9 +11,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.CircularBounds;
 import com.google.android.libraries.places.api.model.LocationRestriction;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FetchPlaceResponse;
 import com.google.android.libraries.places.api.net.FetchResolvedPhotoUriRequest;
@@ -55,22 +56,26 @@ public class RestaurantRepository {
 
     public void fetchNearbyRestaurants(Location location) {
         if (location == null) {
+            Log.d("RestaurantRepository", "Location is null, skipping search");
             return;
         }
 
+        Log.d("RestaurantRepository", "Fetching restaurants for location: " + location.getLatitude() + ", " + location.getLongitude());
         LatLng center = new LatLng(location.getLatitude(), location.getLongitude());
-        double radiusInMeters = 1500;
-        double latOffset = radiusInMeters / 111111.1;
-        double lngOffset = radiusInMeters / (111111.1 * Math.cos(Math.toRadians(center.latitude)));
-        LatLng southWest = new LatLng(center.latitude - latOffset, center.longitude - lngOffset);
-        LatLng northEast = new LatLng(center.latitude + latOffset, center.longitude + lngOffset);
-        LocationRestriction locationRestriction = RectangularBounds.newInstance(southWest, northEast);
+        double radiusInMeters = 3000; // Increased radius to 3km
+        LocationRestriction locationRestriction = CircularBounds.newInstance(center, radiusInMeters);
 
         SearchNearbyRequest searchRequest = SearchNearbyRequest.builder(locationRestriction, Collections.singletonList(Place.Field.ID))
-                .setIncludedTypes(Collections.singletonList("restaurant"))
+                .setIncludedTypes(Arrays.asList("restaurant", "cafe", "bakery", "bar"))
+                .setMaxResultCount(20)
                 .build();
 
         placesClient.searchNearby(searchRequest).addOnSuccessListener(searchResponse -> {
+            Log.d("RestaurantRepository", "Found " + searchResponse.getPlaces().size() + " nearby places");
+            if (searchResponse.getPlaces().isEmpty()) {
+                nearbyRestaurantsLiveData.setValue(new ArrayList<>());
+                return;
+            }
             List<Task<FetchPlaceResponse>> fetchPlaceTasks = new ArrayList<>();
 
             for (Place minimalPlace : searchResponse.getPlaces()) {
@@ -86,33 +91,52 @@ public class RestaurantRepository {
                             Place.Field.CURRENT_OPENING_HOURS,
                             Place.Field.BUSINESS_STATUS,
                             Place.Field.NATIONAL_PHONE_NUMBER,
-                            Place.Field.WEBSITE_URI
+                            Place.Field.WEBSITE_URI,
+                            Place.Field.TYPES
                     );
                     FetchPlaceRequest fetchRequest = FetchPlaceRequest.newInstance(minimalPlace.getId(), detailFields);
                     fetchPlaceTasks.add(placesClient.fetchPlace(fetchRequest));
                 }
             }
 
-            Tasks.whenAllSuccess(fetchPlaceTasks).addOnSuccessListener(responses -> {
+            Tasks.whenAllComplete(fetchPlaceTasks).addOnCompleteListener(allTasks -> {
                 List<Task<Restaurant>> restaurantTasks = new ArrayList<>();
 
-                for (Object response : responses) {
-                    Place detailedPlace = ((FetchPlaceResponse) response).getPlace();
-                    restaurantTasks.add(processPlace(detailedPlace));
+                for (Task<FetchPlaceResponse> task : fetchPlaceTasks) {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        Place detailedPlace = task.getResult().getPlace();
+                        restaurantTasks.add(processPlace(detailedPlace));
+                    }
                 }
 
-                Tasks.whenAllSuccess(restaurantTasks).addOnSuccessListener(processedRestaurants -> {
+                if (restaurantTasks.isEmpty()) {
+                    nearbyRestaurantsLiveData.setValue(new ArrayList<>());
+                    return;
+                }
+
+                Tasks.whenAllComplete(restaurantTasks).addOnCompleteListener(allRestaurantTasks -> {
                     List<Restaurant> restaurants = new ArrayList<>();
-                    for (Object r : processedRestaurants) {
-                        restaurants.add((Restaurant) r);
+                    for (Task<Restaurant> task : restaurantTasks) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            restaurants.add(task.getResult());
+                        }
                     }
+                    Log.d("RestaurantRepository", "Processed " + restaurants.size() + " restaurants");
                     nearbyRestaurantsLiveData.setValue(restaurants);
                 });
             });
-        }).addOnFailureListener(Throwable::printStackTrace);
+        }).addOnFailureListener(e -> {
+            Log.e("RestaurantRepository", "Error searching nearby: " + e.getMessage());
+            e.printStackTrace();
+            nearbyRestaurantsLiveData.setValue(new ArrayList<>()); // Emit empty to stop loading
+        });
     }
 
     private Task<Restaurant> processPlace(Place detailedPlace) {
+        if (!isEstablishmentARestaurant(detailedPlace)) {
+            return Tasks.forResult(null);
+        }
+
         LatLng latLng = detailedPlace.getLocation();
         if (latLng == null) return Tasks.forResult(null);
 
@@ -158,6 +182,43 @@ public class RestaurantRepository {
                     null
             ));
         }
+    }
+
+    private boolean isEstablishmentARestaurant(Place place) {
+        if (place.getPlaceTypes() == null) return true;
+
+        List<String> types = place.getPlaceTypes();
+
+        // Must have at least one of these "positive" types
+        List<String> validTypes = Arrays.asList("restaurant", "cafe", "bakery", "bar", "meal_takeaway");
+        boolean hasValidType = false;
+        for (String type : types) {
+            if (validTypes.contains(type.toLowerCase())) {
+                hasValidType = true;
+                break;
+            }
+        }
+
+        if (!hasValidType) return false;
+
+        // Explicitly exclude non-dining establishments even if they have a "food" sub-type
+        List<String> excludedTypes = Arrays.asList(
+                "gas_station",
+                "supermarket",
+                "grocery_or_supermarket",
+                "convenience_store",
+                "car_repair",
+                "car_wash",
+                "lodging"
+        );
+
+        for (String type : types) {
+            if (excludedTypes.contains(type.toLowerCase())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private String formatOpeningHours(Place place) {
