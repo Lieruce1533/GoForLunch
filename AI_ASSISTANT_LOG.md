@@ -291,3 +291,8 @@
     *   **Action (Resources)**: Created `ic_default_restaurant.xml`, a new vector drawable representing a restaurant icon (fork and knife).
     *   **Action (Adapter)**: Updated `RestaurantAdapter.java` to use the new icon as a placeholder and error image when a restaurant has no photo.
     *   **Action (Fragment)**: Updated `RestaurantDetailFragment.java` to use the same new icon for consistency in the detail view.
+
+*   **Branch Transition & Testing Phase**:
+    *   **Action (Git)**: Rebased `feature/location-services` onto `develop` and merged it, successfully closing the primary feature development branch.
+    *   **Action (Git)**: Created a new `feature/testing` branch to begin Phase 5 of the development plan.
+    *   **Action (Documentation)**: Updated `APP_ARCHITECTURE_PLAN.md` to include "Phase 5: Testing & Quality Assurance", outlining the strategy for Unit and Instrumented tests.

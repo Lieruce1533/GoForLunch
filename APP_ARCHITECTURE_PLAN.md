@@ -66,3 +66,9 @@ This is the most critical phase that sets up all the core components.
 
 - **Search**: Implement a search bar to filter restaurants.
 - **UI/UX Polish**: Implement optional features like making phone calls or launching Google Maps for directions from the detail view.
+
+### Phase 5: Testing & Quality Assurance
+
+1.  **Unit Testing**: Implement unit tests for the Repositories (`UserRepository`, `RestaurantRepository`) and ViewModels (`MainViewModel`, `MapsViewModel`, `WorkmatesViewModel`) to ensure business logic is correct. Use Mockito to mock dependencies.
+2.  **Instrumented Testing (Espresso)**: Create UI tests to verify the navigation flow (Bottom Navigation, Drawer) and key user interactions (Login, Restaurant selection).
+3.  **Edge Case Verification**: Test app behavior with no internet connection, GPS disabled, and denied permissions.
