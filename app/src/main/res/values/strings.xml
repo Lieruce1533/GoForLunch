@@ -22,4 +22,18 @@
     <string name="likes_updated">Likes updated!</string>
     <string name="pick_this_restaurant">I\'m eating here</string>
     <string name="cancel_choice">I changed my mind</string>
+    <string name="no_coworkers_found">No coworkers found.</string>
+    <string name="enable_notifications">Enable Lunch Notifications</string>
+    <string name="notifications_description">Receive a reminder at noon about your chosen restaurant.</string>
+    <string name="search_this_area">Search this area</string>
+    <string name="reset_to_my_location">Reset to my location</string>
+    <string name="notification_title">Lunch Reminder</string>
+    <string name="notification_msg_short">You are eating at %s today!</string>
+    <string name="notification_msg_start">You have lunch at %s.</string>
+    <string name="notification_msg_workmates">With: </string>
+    <string name="language">Language</string>
+    <string name="english">English</string>
+    <string name="french">French</string>
+    <string name="english_flag">🇺🇸 EN</string>
+    <string name="french_flag">FR 🇫🇷</string>
 </resources>

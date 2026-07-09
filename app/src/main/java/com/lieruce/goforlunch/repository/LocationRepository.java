@@ -64,7 +64,7 @@ public class LocationRepository {
     }
 
     public void stopLocationUpdates() {
-        if (locationCallback != null) {
+        if (fusedLocationProviderClient != null && locationCallback != null) {
             fusedLocationProviderClient.removeLocationUpdates(locationCallback);
             locationCallback = null;
         }

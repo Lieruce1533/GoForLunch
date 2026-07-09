@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel;
 import com.lieruce.goforlunch.model.User;
 import com.lieruce.goforlunch.repository.UserRepository;
 
+import java.util.Collections;
 import java.util.List;
 
 public class WorkmatesViewModel extends ViewModel {
@@ -23,7 +24,14 @@ public class WorkmatesViewModel extends ViewModel {
         // Use a SnapshotListener for real-time updates
         userRepository.getAllUsers().addSnapshotListener((value, error) -> {
             if (error == null && value != null) {
-                workmatesLiveData.setValue(value.toObjects(User.class));
+                List<User> users = value.toObjects(User.class);
+                // Sort locally for API 23 compatibility
+                Collections.sort(users, (u1, u2) -> {
+                    String n1 = u1.getUsername() != null ? u1.getUsername() : "";
+                    String n2 = u2.getUsername() != null ? u2.getUsername() : "";
+                    return n1.compareToIgnoreCase(n2);
+                });
+                workmatesLiveData.setValue(users);
             }
         });
     }

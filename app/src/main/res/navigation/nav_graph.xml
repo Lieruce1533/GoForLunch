@@ -32,6 +32,12 @@
         tools:layout="@layout/fragment_workmates" />
 
     <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.lieruce.goforlunch.ui.settings.SettingsFragment"
+        android:label="@string/settings"
+        tools:layout="@layout/fragment_settings" />
+
+    <fragment
         android:id="@+id/restaurantDetailFragment"
         android:name="com.lieruce.goforlunch.ui.restaurants.RestaurantDetailFragment"
         android:label="Restaurant Detail"

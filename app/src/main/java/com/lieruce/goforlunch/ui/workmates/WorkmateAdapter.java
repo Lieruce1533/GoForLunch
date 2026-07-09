@@ -1,6 +1,5 @@
 package com.lieruce.goforlunch.ui.workmates;
 
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -69,14 +68,21 @@ public class WorkmateAdapter extends RecyclerView.Adapter<WorkmateAdapter.Workma
         }
 
         public void bind(User user) {
+            String username = user.getUsername() != null ? user.getUsername() : "A coworker";
             String status;
-            if (user.getChosenRestaurantId() != null) {
-                status = user.getUsername() + " is eating at (" + user.getChosenRestaurantName() + ")";
-                binding.workmateStatus.setTextColor(Color.BLACK);
+            
+            // Get standard theme colors
+            int colorOnSurface = com.google.android.material.color.MaterialColors.getColor(binding.workmateStatus, com.google.android.material.R.attr.colorOnSurface);
+            int colorOnSurfaceVariant = com.google.android.material.color.MaterialColors.getColor(binding.workmateStatus, com.google.android.material.R.attr.colorOnSurfaceVariant);
+
+            if (user.getChosenRestaurantId() != null && !user.getChosenRestaurantId().isEmpty()) {
+                String restaurantName = user.getChosenRestaurantName() != null ? user.getChosenRestaurantName() : "a restaurant";
+                status = username + " is eating at (" + restaurantName + ")";
+                binding.workmateStatus.setTextColor(colorOnSurface);
                 binding.workmateStatus.setTypeface(null, Typeface.NORMAL);
             } else {
-                status = user.getUsername() + " hasn't decided yet";
-                binding.workmateStatus.setTextColor(Color.GRAY);
+                status = username + " hasn't decided yet";
+                binding.workmateStatus.setTextColor(colorOnSurfaceVariant);
                 binding.workmateStatus.setTypeface(null, Typeface.ITALIC);
             }
             binding.workmateStatus.setText(status);
@@ -115,7 +121,8 @@ public class WorkmateAdapter extends RecyclerView.Adapter<WorkmateAdapter.Workma
             User newItem = newList.get(newPos);
             return Objects.equals(oldItem.getUsername(), newItem.getUsername()) &&
                    Objects.equals(oldItem.getAvatarUrl(), newItem.getAvatarUrl()) &&
-                   Objects.equals(oldItem.getChosenRestaurantId(), newItem.getChosenRestaurantId());
+                   Objects.equals(oldItem.getChosenRestaurantId(), newItem.getChosenRestaurantId()) &&
+                   Objects.equals(oldItem.getChosenRestaurantName(), newItem.getChosenRestaurantName());
         }
     }
 }

@@ -67,14 +67,14 @@ public class MapFragment extends Fragment {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
-            googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+            googleMap.getUiSettings().setMyLocationButtonEnabled(false); // Using custom FAB instead
         }
 
-        // Observe User Location
-        viewModel.getUserLocation().observe(getViewLifecycleOwner(), location -> {
+        // Observe User Location (only for initial camera move)
+        viewModel.getLocationToUse().observe(getViewLifecycleOwner(), location -> {
             if (location != null && !isInitialLocationSet) {
                 LatLng userLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 13f));
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 15f));
                 isInitialLocationSet = true;
             }
         });
@@ -97,6 +97,32 @@ public class MapFragment extends Fragment {
             if (restaurant != null) {
                 navigateToDetail(restaurant.getId());
             }
+        });
+
+        // Manual Location Selection logic
+        setupManualLocationListeners();
+    }
+
+    private void setupManualLocationListeners() {
+        googleMap.setOnCameraMoveStartedListener(reason -> {
+            if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                binding.btnSearchArea.setVisibility(View.VISIBLE);
+            }
+        });
+
+        binding.btnSearchArea.setOnClickListener(v -> {
+            LatLng center = googleMap.getCameraPosition().target;
+            android.location.Location location = new android.location.Location("manual");
+            location.setLatitude(center.latitude);
+            location.setLongitude(center.longitude);
+            viewModel.setManualLocation(location);
+            binding.btnSearchArea.setVisibility(View.GONE);
+        });
+
+        binding.fabMyLocation.setOnClickListener(v -> {
+            viewModel.resetToCurrentLocation();
+            isInitialLocationSet = false; // Allow re-centering once
+            binding.btnSearchArea.setVisibility(View.GONE);
         });
     }
 

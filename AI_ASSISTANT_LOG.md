@@ -233,19 +233,61 @@
 
 *   **Current Status:** The app now launches successfully and reaches the login screen. The map is currently empty due to an invalid/fake API key.
 
-## Session: 2026-05-02
+## Session: 2026-07-05
 
 ### Summary of Work:
 
-*   **Bug Fixes & Robustness:**
-    *   **Action (Places API):** Fixed a crash by switching from `RectangularBounds` to `CircularBounds` as required by the new Places SDK.
-    *   **Action (Data Flow):** Updated `RestaurantRepository` and `MapsViewModel` to show restaurants immediately upon loading from Google, rather than waiting for Firestore enrichment. This fixed the "empty list" issue.
-    *   **Action (Search):** Broadened search types to include cafes, bakeries, and bars, and removed the unsupported "food" type.
+*   **UI Refinement - Restaurant Selection:**
+    *   **Action (Layout):** Replaced the small circular FloatingActionButton with an **Extended FAB** at the bottom-right of the detail screen. This makes the primary action (selecting a restaurant) much more visible.
+    *   **Action (Text):** Added dynamic labels: **"I'M EATING HERE"** (green) vs. **"I CHANGED MY MIND"** (red).
+    *   **Action (UX):** Added padding to the workmates list to prevent the new button from overlapping the last list item.
 
-*   **UI/UX Improvements:**
-    *   **Action (Map):** Adjusted zoom level to `13.5f` to better visualize the 1.5km search radius.
-    *   **Action (Ratings):** Implemented normalization logic to convert Google's 5-star rating to our app's 3-star UI.
-    *   **Action (Interactions):** Fixed the "Like" button logic in `RestaurantDetailViewModel` and added Toast feedback for selection/like actions.
-    *   **Action (Empty States):** Added a loading spinner and a "No results" message to the restaurant list.
+*   **Bug Fix - Selection Persistence:**
+    *   **Action (Repository):** Identified and fixed a bug in `UserRepository.createUser()` where restaurant selections were being accidentally overwritten with `null` during startup synchronization. Switched the logic to use a **Map-based merge**, which protects existing fields like `chosenRestaurantId`.
 
-*   **Status:** The app is now functional on physical devices with real data loading on both Map and List views.
+*   **Code Cleanup - Modernization:**
+    *   **Action (Back Navigation):** Migrated from the deprecated `onBackPressed()` to the modern `OnBackPressedDispatcher`.
+    *   **Action (Colors):** Replaced deprecated `getResources().getColor()` with `ContextCompat.getColor()`.
+    *   **Action (Gradle):** Cleaned up `gradle.properties` and updated target SDK to **35**.
+
+## Session: 2026-07-09
+
+### Summary of Work:
+
+*   **Bug Fix - User Profile Synchronization**:
+    *   **Problem**: Coworkers list often showed "a coworker" instead of the user's name because Firestore sync only occurred during the sign-in result, not on every app start.
+    *   **Action (MainActivity)**: Moved the `mainViewModel.createUser()` call into the `userLiveData` observer. This ensures that the user's profile (name and photo) is synced with Firestore on every app launch and whenever the user state changes.
+    *   **Action (MainActivity)**: Cleaned up the redundant `createUser()` call in `onSignInResult`.
+
+*   **Settings Feature - Foundation**:
+    *   **Action (UI)**: Created `fragment_settings.xml` with a `MaterialSwitch` for lunch notifications, following Material 3 design.
+    *   **Action (Fragment)**: Created `SettingsFragment.java` to handle the settings UI and persist the notification toggle state using `SharedPreferences`.
+    *   **Action (Navigation)**: Integrated `SettingsFragment` into `nav_graph.xml`.
+    *   **Action (MainActivity)**: Updated the Navigation Drawer listener to navigate to the new `SettingsFragment` when "Settings" is selected.
+    *   **Action (Strings)**: Added necessary string resources for the settings screen.
+
+*   **Robust Data Persistence & Manual Location**:
+    *   **Fix (Bug)**: Addressed the issue where the restaurant list became empty after locking/unlocking the phone.
+    *   **Action (ViewModel)**: Refactored `MapsViewModel` to hold and use the last known location immediately upon initialization, preventing "empty states" during Activity recreation.
+    *   **Action (UI)**: Added `SwipeRefreshLayout` to the restaurant list, allowing users to manually trigger a data refresh ("actualize").
+    *   **Action (Feature)**: Implemented "Manual Location Selection". Users can now pan the map and click "Search this area" to find restaurants in a different location.
+    *   **Action (UI)**: Added a custom "My Location" FAB to the map to easily reset the view and search back to the user's GPS position.
+
+*   **Lunch Notifications Implementation**:
+    *   **Action (Dependency)**: Added `androidx.work:work-runtime` for reliable background task management.
+    *   **Action (Worker)**: Created `NotificationWorker.java` to handle the logic of fetching lunch choices and workmates in the background.
+    *   **Action (Helper)**: Created `WorkManagerHelper.java` to schedule the daily reminder at 12:00 PM.
+    *   **Action (UI)**: Connected the Settings toggle to schedule or cancel notifications.
+    *   **Action (Permission)**: Implemented `POST_NOTIFICATIONS` permission request flow for Android 13+.
+    *   **Action (Data)**: Updated `User` model and Firestore logic to include restaurant addresses, making notifications more informative.
+
+*   **Multi-Language Support (English/French)**:
+    *   **Action (Resources)**: Created `values-fr/strings.xml` and translated all app strings into French.
+    *   **Action (UI)**: Updated `fragment_settings.xml` with a "cursor switch" (MaterialSwitch) and flag emojis to toggle between English and French.
+    *   **Action (Logic)**: Implemented runtime language switching in `SettingsFragment.java` using the modern `AppCompatDelegate.setApplicationLocales` API.
+    *   **Action (Manifest)**: Added `AppLocalesMetadataHolderService` to support automatic locale persistence on Android 13+.
+
+*   **UI Polish - Default Restaurant Image**:
+    *   **Action (Resources)**: Created `ic_default_restaurant.xml`, a new vector drawable representing a restaurant icon (fork and knife).
+    *   **Action (Adapter)**: Updated `RestaurantAdapter.java` to use the new icon as a placeholder and error image when a restaurant has no photo.
+    *   **Action (Fragment)**: Updated `RestaurantDetailFragment.java` to use the same new icon for consistency in the detail view.

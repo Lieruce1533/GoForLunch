@@ -49,11 +49,17 @@ public class RestaurantsFragment extends Fragment implements RestaurantAdapter.O
         adapter = new RestaurantAdapter(this);
         binding.restaurantRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.restaurantRecyclerView.setAdapter(adapter);
+
+        binding.swipeRefreshLayout.setOnRefreshListener(() -> {
+            mapsViewModel.refreshLocation();
+        });
     }
 
     private void observeData() {
         // Show loading initially
-        binding.loadingIndicator.setVisibility(View.VISIBLE);
+        if (mapsViewModel.getNearbyRestaurants().getValue() == null) {
+            binding.loadingIndicator.setVisibility(View.VISIBLE);
+        }
 
         // Observe user location to calculate distance
         mapsViewModel.getUserLocation().observe(getViewLifecycleOwner(), location -> {
@@ -65,6 +71,7 @@ public class RestaurantsFragment extends Fragment implements RestaurantAdapter.O
         // Observe restaurant list
         mapsViewModel.getNearbyRestaurants().observe(getViewLifecycleOwner(), restaurants -> {
             binding.loadingIndicator.setVisibility(View.GONE);
+            binding.swipeRefreshLayout.setRefreshing(false);
             if (restaurants != null) {
                 adapter.setRestaurants(restaurants);
                 if (restaurants.isEmpty()) {

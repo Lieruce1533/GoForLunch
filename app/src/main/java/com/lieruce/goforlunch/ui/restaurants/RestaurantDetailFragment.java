@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -75,11 +76,11 @@ public class RestaurantDetailFragment extends Fragment {
             if (isSelected) {
                 binding.detailSelectFab.setText(R.string.cancel_choice);
                 binding.detailSelectFab.setIconResource(R.drawable.ic_check_circle);
-                binding.detailSelectFab.setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
+                binding.detailSelectFab.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
             } else {
                 binding.detailSelectFab.setText(R.string.pick_this_restaurant);
                 binding.detailSelectFab.setIconResource(android.R.drawable.checkbox_off_background);
-                binding.detailSelectFab.setBackgroundColor(getResources().getColor(android.R.color.holo_green_dark));
+                binding.detailSelectFab.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
             }
         });
 
@@ -104,6 +105,7 @@ public class RestaurantDetailFragment extends Fragment {
     private void updateUI(Restaurant restaurant) {
         binding.detailRestaurantName.setText(restaurant.getName());
         binding.detailRestaurantAddress.setText(restaurant.getAddress());
+        binding.detailRestaurantHours.setText(restaurant.getOpeningHours());
         
         // Normalize Google Rating (0-5) to App Stars (0-3)
         float normalizedRating = (float) (restaurant.getRating() * 3.0 / 5.0);
@@ -112,8 +114,8 @@ public class RestaurantDetailFragment extends Fragment {
         // Photo loading
         Glide.with(this)
                 .load(restaurant.getPhotoUrl())
-                .placeholder(R.drawable.ic_launcher_background)
-                .error(R.drawable.ic_launcher_background)
+                .placeholder(R.drawable.ic_default_restaurant)
+                .error(R.drawable.ic_default_restaurant)
                 .centerCrop()
                 .into(binding.detailRestaurantPhoto);
         

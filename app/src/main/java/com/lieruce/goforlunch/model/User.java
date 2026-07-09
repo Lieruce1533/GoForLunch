@@ -9,6 +9,7 @@ public class User {
     private String avatarUrl;
     private String chosenRestaurantId;
     private String chosenRestaurantName;
+    private String chosenRestaurantAddress;
     private List<String> likedRestaurants;
 
     // Firestore requires a public no-argument constructor
@@ -26,6 +27,7 @@ public class User {
     public String getAvatarUrl() { return avatarUrl; }
     public String getChosenRestaurantId() { return chosenRestaurantId; }
     public String getChosenRestaurantName() { return chosenRestaurantName; }
+    public String getChosenRestaurantAddress() { return chosenRestaurantAddress; }
     public List<String> getLikedRestaurants() { return likedRestaurants; }
 
     // --- SETTERS ---
@@ -34,5 +36,6 @@ public class User {
     public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
     public void setChosenRestaurantId(String chosenRestaurantId) { this.chosenRestaurantId = chosenRestaurantId; }
     public void setChosenRestaurantName(String chosenRestaurantName) { this.chosenRestaurantName = chosenRestaurantName; }
+    public void setChosenRestaurantAddress(String chosenRestaurantAddress) { this.chosenRestaurantAddress = chosenRestaurantAddress; }
     public void setLikedRestaurants(List<String> likedRestaurants) { this.likedRestaurants = likedRestaurants; }
 }

@@ -52,7 +52,8 @@ public class WorkmateDetailAdapter extends RecyclerView.Adapter<WorkmateDetailAd
         }
 
         public void bind(User user) {
-            String joiningText = user.getUsername() + " is joining!";
+            String username = user.getUsername() != null ? user.getUsername() : "A coworker";
+            String joiningText = username + " is joining!";
             binding.workmateName.setText(joiningText);
 
             Glide.with(binding.workmateAvatar.getContext())

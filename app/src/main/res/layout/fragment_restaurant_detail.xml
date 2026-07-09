@@ -53,6 +53,20 @@
         app:layout_constraintTop_toBottomOf="@+id/detail_restaurant_name"
         tools:text="123 Restaurant St, City" />
 
+    <TextView
+        android:id="@+id/detail_restaurant_hours"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+        android:textColor="@android:color/white"
+        android:textStyle="italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/detail_restaurant_address"
+        tools:text="Open until 10 PM" />
+
     <RatingBar
         android:id="@+id/detail_restaurant_rating"
         style="@android:style/Widget.Material.RatingBar.Small"

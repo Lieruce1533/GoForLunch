@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -37,6 +38,7 @@ import com.lieruce.goforlunch.repository.LocationRepository;
 import com.lieruce.goforlunch.viewmodel.MainViewModel;
 import com.lieruce.goforlunch.viewmodel.MapsViewModel;
 import com.lieruce.goforlunch.viewmodel.ViewModelFactory;
+import com.lieruce.goforlunch.worker.WorkManagerHelper;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -55,12 +57,30 @@ public class MainActivity extends AppCompatActivity {
     private final ActivityResultLauncher<Intent> signInLauncher =
             registerForActivityResult(new FirebaseAuthUIActivityResultContract(), this::onSignInResult);
 
-    private final ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
+    private final ActivityResultLauncher<String[]> requestPermissionsLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                boolean fineLocationGranted = false;
+                if (result.containsKey(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    Boolean granted = result.get(Manifest.permission.ACCESS_FINE_LOCATION);
+                    fineLocationGranted = granted != null && granted;
+                } else {
+                    // If not requested now, check current status
+                    fineLocationGranted = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+                }
+
+                if (fineLocationGranted) {
                     startLocationUpdates();
                 } else {
                     showSnackBar("Location permission denied. Map features disabled.");
+                }
+
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                    if (result.containsKey(Manifest.permission.POST_NOTIFICATIONS)) {
+                        Boolean granted = result.get(Manifest.permission.POST_NOTIFICATIONS);
+                        if (granted != null && !granted) {
+                            showSnackBar("Notifications disabled. You won't receive lunch reminders.");
+                        }
+                    }
                 }
             });
 
@@ -75,14 +95,59 @@ public class MainActivity extends AppCompatActivity {
         mapsViewModel = new ViewModelProvider(this, factory).get(MapsViewModel.class);
 
         setupToolbar();
-        setupNavigation(); // Initialize navigation once here
+        setupNavigation(); // Initialize navigation once at the start
+        setupBackNavigation();
+
+        WorkManagerHelper.scheduleLunchReminder(this);
 
         mainViewModel.getUserLiveData().observe(this, firebaseUser -> {
             if (firebaseUser != null) {
                 updateNavHeader();
-                requestLocationPermission();
+                // Request permission only after successful login
+                requestPermissions();
+                // Sync user data with Firestore on every launch to ensure profile info is up to date
+                mainViewModel.createUser();
             } else {
                 launchSignInFlow();
+            }
+        });
+    }
+
+    private void requestPermissions() {
+        List<String> permissionsToRequest = new java.util.ArrayList<>();
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissionsToRequest.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        } else {
+            startLocationUpdates();
+        }
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
+
+        if (!permissionsToRequest.isEmpty()) {
+            requestPermissionsLauncher.launch(permissionsToRequest.toArray(new String[0]));
+        }
+    }
+
+    private void setupBackNavigation() {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    binding.drawerLayout.closeDrawer(GravityCompat.START);
+                } else {
+                    // Check if we can navigate up in the navigation stack
+                    if (!navController.navigateUp()) {
+                        // If not, use the system back behavior (e.g., close app)
+                        setEnabled(false); // Temporarily disable this callback
+                        getOnBackPressedDispatcher().onBackPressed();
+                        setEnabled(true); // Re-enable for next time
+                    }
+                }
             }
         });
     }
@@ -171,13 +236,11 @@ public class MainActivity extends AppCompatActivity {
         binding.navView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_logout) {
-                mainViewModel.signOut(this).addOnSuccessListener(aVoid -> {
-                    mainViewModel.refreshUser();
-                });
+                mainViewModel.signOut(this).addOnSuccessListener(aVoid -> mainViewModel.refreshUser());
             } else if (id == R.id.nav_your_lunch) {
                 navigateToYourLunch();
             } else if (id == R.id.nav_settings) {
-                showSnackBar("Settings clicked");
+                navController.navigate(R.id.settingsFragment);
             }
             binding.drawerLayout.closeDrawer(GravityCompat.START);
             return true;
@@ -187,13 +250,15 @@ public class MainActivity extends AppCompatActivity {
     private void navigateToYourLunch() {
         mainViewModel.getCurrentUserData().addOnSuccessListener(documentSnapshot -> {
             User user = documentSnapshot.toObject(User.class);
-            if (user != null && user.getChosenRestaurantId() != null) {
+            if (user != null && user.getChosenRestaurantId() != null && !user.getChosenRestaurantId().isEmpty()) {
                 Bundle args = new Bundle();
                 args.putString("restaurantId", user.getChosenRestaurantId());
                 navController.navigate(R.id.restaurantDetailFragment, args);
             } else {
                 showSnackBar("You haven't chosen a restaurant yet!");
             }
+        }).addOnFailureListener(e -> {
+            showSnackBar("Error fetching your lunch choice: " + e.getMessage());
         });
     }
 
@@ -220,15 +285,6 @@ public class MainActivity extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, appBarConfiguration) || super.onSupportNavigateUp();
     }
 
-    private void requestLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            startLocationUpdates();
-        } else {
-            // Using post to ensure activity is in a valid state to show the permission dialog
-            binding.getRoot().post(() -> requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION));
-        }
-    }
-
     private void startLocationUpdates() {
         LocationRepository.getInstance(this).startLocationUpdates();
         showSnackBar("Location updates started!");
@@ -249,11 +305,6 @@ public class MainActivity extends AppCompatActivity {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
             mainViewModel.refreshUser();
-            mainViewModel.createUser().addOnSuccessListener(aVoid -> {
-                showSnackBar("User data synced with Firestore!");
-            }).addOnFailureListener(e -> {
-                showSnackBar("Error syncing user data with Firestore.");
-            });
         } else {
             if (response == null) {
                 showSnackBar("Sign in cancelled");
@@ -265,14 +316,5 @@ public class MainActivity extends AppCompatActivity {
 
     private void showSnackBar(String message) {
         Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            binding.drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
     }
 }

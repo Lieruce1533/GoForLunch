@@ -80,10 +80,10 @@ public class RestaurantDetailViewModel extends ViewModel {
             boolean newValue = (currentlySelected == null) || !currentlySelected;
             if (!newValue) {
                 // Deselect: Clear the choice
-                userRepository.updateChosenRestaurant(currentUser.getUid(), null, null);
+                userRepository.updateChosenRestaurant(currentUser.getUid(), null, null, null);
             } else {
                 // Select: Set the choice
-                userRepository.updateChosenRestaurant(currentUser.getUid(), restaurant.getId(), restaurant.getName());
+                userRepository.updateChosenRestaurant(currentUser.getUid(), restaurant.getId(), restaurant.getName(), restaurant.getAddress());
             }
             isRestaurantSelected.setValue(newValue);
         }
