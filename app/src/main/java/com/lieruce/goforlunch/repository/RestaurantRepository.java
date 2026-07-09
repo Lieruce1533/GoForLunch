@@ -92,7 +92,8 @@ public class RestaurantRepository {
                             Place.Field.BUSINESS_STATUS,
                             Place.Field.NATIONAL_PHONE_NUMBER,
                             Place.Field.WEBSITE_URI,
-                            Place.Field.TYPES
+                            Place.Field.TYPES,
+                            Place.Field.PRIMARY_TYPE
                     );
                     FetchPlaceRequest fetchRequest = FetchPlaceRequest.newInstance(minimalPlace.getId(), detailFields);
                     fetchPlaceTasks.add(placesClient.fetchPlace(fetchRequest));
@@ -126,8 +127,7 @@ public class RestaurantRepository {
                 });
             });
         }).addOnFailureListener(e -> {
-            Log.e("RestaurantRepository", "Error searching nearby: " + e.getMessage());
-            e.printStackTrace();
+            Log.e("RestaurantRepository", "Error searching nearby: " + (e.getMessage() != null ? e.getMessage() : "Unknown error"));
             nearbyRestaurantsLiveData.setValue(new ArrayList<>()); // Emit empty to stop loading
         });
     }
@@ -185,12 +185,21 @@ public class RestaurantRepository {
     }
 
     private boolean isEstablishmentARestaurant(Place place) {
-        if (place.getPlaceTypes() == null) return true;
+        // 1. Check Primary Type (Most accurate)
+        if (place.getPrimaryType() != null) {
+            String primary = place.getPrimaryType().toLowerCase();
+            List<String> explicitlyExcludedPrimary = Arrays.asList(
+                    "gas_station", "supermarket", "grocery_or_supermarket", 
+                    "convenience_store", "car_repair", "car_wash", "lodging", "store"
+            );
+            if (explicitlyExcludedPrimary.contains(primary)) return false;
+        }
 
+        // 2. Check all types as fallback
+        if (place.getPlaceTypes() == null) return true;
         List<String> types = place.getPlaceTypes();
 
-        // Must have at least one of these "positive" types
-        List<String> validTypes = Arrays.asList("restaurant", "cafe", "bakery", "bar", "meal_takeaway");
+        List<String> validTypes = Arrays.asList("restaurant", "cafe", "bakery", "bar", "meal_takeaway", "food", "establishment", "point_of_interest");
         boolean hasValidType = false;
         for (String type : types) {
             if (validTypes.contains(type.toLowerCase())) {
@@ -198,27 +207,7 @@ public class RestaurantRepository {
                 break;
             }
         }
-
-        if (!hasValidType) return false;
-
-        // Explicitly exclude non-dining establishments even if they have a "food" sub-type
-        List<String> excludedTypes = Arrays.asList(
-                "gas_station",
-                "supermarket",
-                "grocery_or_supermarket",
-                "convenience_store",
-                "car_repair",
-                "car_wash",
-                "lodging"
-        );
-
-        for (String type : types) {
-            if (excludedTypes.contains(type.toLowerCase())) {
-                return false;
-            }
-        }
-
-        return true;
+        return hasValidType;
     }
 
     private String formatOpeningHours(Place place) {

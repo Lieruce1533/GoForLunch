@@ -10,6 +10,8 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.SetOptions;
 import com.lieruce.goforlunch.model.User;
 
+import com.lieruce.goforlunch.model.User;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,13 +38,27 @@ public class UserRepository {
 
     // --- CREATE ---
     public Task<Void> createUser(FirebaseUser firebaseUser) {
+        if (firebaseUser == null) return null;
+
         String uid = firebaseUser.getUid();
-        String username = firebaseUser.getDisplayName();
-        String avatarUrl = (firebaseUser.getPhotoUrl() != null) ? firebaseUser.getPhotoUrl().toString() : null;
+        String name = firebaseUser.getDisplayName();
+        
+        // Fallback: If no display name, use the part of email before '@'
+        if ((name == null || name.isEmpty()) && firebaseUser.getEmail() != null) {
+            name = firebaseUser.getEmail().split("@")[0];
+        }
+        
+        if (name == null || name.isEmpty()) {
+            name = "Anonymous";
+        }
 
-        User userToCreate = new User(uid, username, avatarUrl);
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("uid", uid);
+        userData.put("username", name);
+        userData.put("avatarUrl", (firebaseUser.getPhotoUrl() != null) ? firebaseUser.getPhotoUrl().toString() : null);
 
-        return usersCollection.document(uid).set(userToCreate, SetOptions.merge());
+        // We use merge() so we don't overwrite chosenRestaurantId or likedRestaurants
+        return usersCollection.document(uid).set(userData, SetOptions.merge());
     }
 
     // --- GET ---
@@ -55,26 +71,29 @@ public class UserRepository {
     }
 
     public Query getAllUsers() {
-        return usersCollection.orderBy("username", Query.Direction.ASCENDING);
+        return usersCollection;
     }
 
     // --- UPDATE ---
     
     // Updates the restaurant the user has chosen for today
-    public Task<Void> updateChosenRestaurant(String uid, String restaurantId, String restaurantName) {
+    public Task<Void> updateChosenRestaurant(String uid, String restaurantId, String restaurantName, String restaurantAddress) {
         Map<String, Object> updates = new HashMap<>();
         updates.put("chosenRestaurantId", restaurantId);
         updates.put("chosenRestaurantName", restaurantName);
+        updates.put("chosenRestaurantAddress", restaurantAddress);
         
-        return usersCollection.document(uid).update(updates);
+        return usersCollection.document(uid).set(updates, SetOptions.merge());
     }
 
     // Toggle liking a restaurant
     public Task<Void> updateLikedRestaurant(String uid, String restaurantId, boolean isLiked) {
+        Map<String, Object> updates = new HashMap<>();
         if (isLiked) {
-            return usersCollection.document(uid).update("likedRestaurants", FieldValue.arrayUnion(restaurantId));
+            updates.put("likedRestaurants", FieldValue.arrayUnion(restaurantId));
         } else {
-            return usersCollection.document(uid).update("likedRestaurants", FieldValue.arrayRemove(restaurantId));
+            updates.put("likedRestaurants", FieldValue.arrayRemove(restaurantId));
         }
+        return usersCollection.document(uid).set(updates, SetOptions.merge());
     }
 }

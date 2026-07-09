@@ -56,6 +56,13 @@ public class WorkmatesFragment extends Fragment implements WorkmateAdapter.OnWor
         viewModel.getWorkmates().observe(getViewLifecycleOwner(), workmates -> {
             if (workmates != null) {
                 adapter.setWorkmates(workmates);
+                if (workmates.isEmpty()) {
+                    binding.workmatesEmptyView.setVisibility(View.VISIBLE);
+                    binding.workmatesRecyclerView.setVisibility(View.GONE);
+                } else {
+                    binding.workmatesEmptyView.setVisibility(View.GONE);
+                    binding.workmatesRecyclerView.setVisibility(View.VISIBLE);
+                }
             }
         });
     }

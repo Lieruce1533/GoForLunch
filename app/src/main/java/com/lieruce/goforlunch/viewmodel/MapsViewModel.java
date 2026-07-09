@@ -21,9 +21,14 @@ public class MapsViewModel extends ViewModel {
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
     
+    private final MutableLiveData<Location> manualLocation = new MutableLiveData<>();
+    private final MediatorLiveData<Location> locationToUse = new MediatorLiveData<>();
     private final MediatorLiveData<List<Restaurant>> nearbyRestaurants = new MediatorLiveData<>();
     private final MutableLiveData<String> searchQuery = new MutableLiveData<>("");
     private final MediatorLiveData<List<Restaurant>> filteredRestaurants = new MediatorLiveData<>();
+    
+    // Cache for workmate counts to prevent flickering
+    private final java.util.Map<String, Integer> restaurantWorkmateCounts = new java.util.HashMap<>();
 
     public MapsViewModel(LocationRepository locationRepository, 
                          RestaurantRepository restaurantRepository,
@@ -32,27 +37,74 @@ public class MapsViewModel extends ViewModel {
         this.restaurantRepository = restaurantRepository;
         this.userRepository = userRepository;
 
-        // 1. Automatically trigger restaurant fetch from Google when location changes
-        nearbyRestaurants.addSource(locationRepository.getLocationLiveData(), location -> {
+        // Combine GPS location and manual location
+        locationToUse.addSource(locationRepository.getLocationLiveData(), location -> {
+            if (manualLocation.getValue() == null && location != null) {
+                locationToUse.setValue(location);
+            }
+        });
+        locationToUse.addSource(manualLocation, location -> {
             if (location != null) {
-                android.util.Log.d("MapsViewModel", "Location received: " + location.getLatitude() + ", " + location.getLongitude());
-                restaurantRepository.fetchNearbyRestaurants(location);
-            } else {
-                android.util.Log.d("MapsViewModel", "Location is null");
+                locationToUse.setValue(location);
             }
         });
 
-        // 2. When Google returns restaurants, enrich them with Firestore data
+        // 1. Automatically trigger restaurant fetch from Google when location to use changes
+        nearbyRestaurants.addSource(locationToUse, location -> {
+            if (location != null) {
+                android.util.Log.d("MapsViewModel", "Fetching for location: " + location.getLatitude() + ", " + location.getLongitude());
+                restaurantRepository.fetchNearbyRestaurants(location);
+            }
+        });
+
+        // Trigger an initial fetch if we already have a location
+        Location initialLocation = locationRepository.getLocationLiveData().getValue();
+        if (initialLocation != null) {
+            locationToUse.setValue(initialLocation);
+        }
+
+        // 2. When Google returns restaurants, enrich them with cached Firestore data
         nearbyRestaurants.addSource(restaurantRepository.getNearbyRestaurantsLiveData(), restaurants -> {
             if (restaurants != null) {
+                applyEnrichment(restaurants);
                 nearbyRestaurants.setValue(restaurants);
-                enrichRestaurantsWithWorkmates(restaurants);
             }
         });
 
-        // 3. Setup filtered restaurants based on nearby list and search query
+        // 3. Listen once for ALL user choices to update counts in real-time
+        userRepository.getAllUsers().addSnapshotListener((value, error) -> {
+            if (error == null && value != null) {
+                updateWorkmateCounts(value.toObjects(com.lieruce.goforlunch.model.User.class));
+            }
+        });
+
+        // 4. Setup filtered restaurants based on nearby list and search query
         filteredRestaurants.addSource(nearbyRestaurants, this::applyFilter);
         filteredRestaurants.addSource(searchQuery, query -> applyFilter(nearbyRestaurants.getValue()));
+    }
+
+    private void updateWorkmateCounts(List<com.lieruce.goforlunch.model.User> users) {
+        restaurantWorkmateCounts.clear();
+        for (com.lieruce.goforlunch.model.User user : users) {
+            String rid = user.getChosenRestaurantId();
+            if (rid != null && !rid.isEmpty()) {
+                int count = restaurantWorkmateCounts.containsKey(rid) ? restaurantWorkmateCounts.get(rid) : 0;
+                restaurantWorkmateCounts.put(rid, count + 1);
+            }
+        }
+        // Re-apply enrichment to the current list
+        List<Restaurant> current = nearbyRestaurants.getValue();
+        if (current != null) {
+            applyEnrichment(current);
+            nearbyRestaurants.setValue(current);
+        }
+    }
+
+    private void applyEnrichment(List<Restaurant> restaurants) {
+        for (Restaurant r : restaurants) {
+            Integer count = restaurantWorkmateCounts.get(r.getId());
+            r.setWorkmatesCount(count != null ? count : 0);
+        }
     }
 
     private void applyFilter(List<Restaurant> restaurants) {
@@ -75,19 +127,6 @@ public class MapsViewModel extends ViewModel {
         filteredRestaurants.setValue(filtered);
     }
 
-    private void enrichRestaurantsWithWorkmates(List<Restaurant> restaurants) {
-        for (Restaurant restaurant : restaurants) {
-            // Add a real-time listener for each restaurant's workmates count
-            userRepository.getUsersEatingAt(restaurant.getId()).addSnapshotListener((value, error) -> {
-                if (error == null && value != null) {
-                    restaurant.setWorkmatesCount(value.size());
-                    // Update the LiveData to trigger UI refresh
-                    nearbyRestaurants.setValue(restaurants);
-                }
-            });
-        }
-    }
-
     public void setSearchQuery(String query) {
         searchQuery.setValue(query);
     }
@@ -102,5 +141,26 @@ public class MapsViewModel extends ViewModel {
 
     public void refreshLocation() {
         locationRepository.startLocationUpdates();
+        // Force a refresh even if location hasn't changed
+        Location current = locationToUse.getValue();
+        if (current != null) {
+            restaurantRepository.fetchNearbyRestaurants(current);
+        }
+    }
+
+    public void setManualLocation(Location location) {
+        manualLocation.setValue(location);
+    }
+
+    public void resetToCurrentLocation() {
+        manualLocation.setValue(null);
+        Location gps = locationRepository.getLocationLiveData().getValue();
+        if (gps != null) {
+            locationToUse.setValue(gps);
+        }
+    }
+
+    public LiveData<Location> getLocationToUse() {
+        return locationToUse;
     }
 }

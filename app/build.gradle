@@ -10,7 +10,7 @@ if (rootProject.file("local.properties").exists()) {
 
 android {
     namespace 'com.lieruce.goforlunch'
-    compileSdk 36
+    compileSdk 35
 
     signingConfigs {
         debug {
@@ -24,7 +24,7 @@ android {
     defaultConfig {
         applicationId "com.lieruce.goforlunch"
         minSdk 23
-        targetSdk 34
+        targetSdk 35
         versionCode 1
         versionName "1.0"
 
@@ -48,7 +48,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-    
+
     buildFeatures {
         viewBinding true
         buildConfig true
@@ -76,6 +76,8 @@ dependencies {
 
     // Image Loading
     implementation libs.glide
+    implementation libs.swiperefreshlayout
+    implementation libs.work.runtime
 
     implementation libs.appcompat
     implementation libs.material

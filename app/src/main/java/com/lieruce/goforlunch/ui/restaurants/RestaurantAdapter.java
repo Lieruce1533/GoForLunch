@@ -112,8 +112,8 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Re
             // --- Photo Loading ---
             Glide.with(binding.restaurantPhoto.getContext())
                     .load(restaurant.getPhotoUrl())
-                    .placeholder(R.drawable.ic_launcher_background)
-                    .error(R.drawable.ic_launcher_background)
+                    .placeholder(R.drawable.ic_default_restaurant)
+                    .error(R.drawable.ic_default_restaurant)
                     .centerCrop()
                     .into(binding.restaurantPhoto);
         }
