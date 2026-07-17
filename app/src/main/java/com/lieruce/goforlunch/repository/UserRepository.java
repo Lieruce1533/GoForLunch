@@ -21,15 +21,16 @@ public class UserRepository {
     private static volatile UserRepository instance;
     private final CollectionReference usersCollection;
 
-    private UserRepository() {
-        this.usersCollection = FirebaseFirestore.getInstance().collection(COLLECTION_NAME);
+    // Visible for testing - allows injecting a mock CollectionReference
+    public UserRepository(CollectionReference usersCollection) {
+        this.usersCollection = usersCollection;
     }
 
     public static UserRepository getInstance() {
         if (instance == null) {
             synchronized(UserRepository.class) {
                 if (instance == null) {
-                    instance = new UserRepository();
+                    instance = new UserRepository(FirebaseFirestore.getInstance().collection(COLLECTION_NAME));
                 }
             }
         }

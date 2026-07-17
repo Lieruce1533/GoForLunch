@@ -7,7 +7,9 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.lieruce.goforlunch.repository.AuthRepository;
+import com.lieruce.goforlunch.repository.GooglePlacesRepository;
 import com.lieruce.goforlunch.repository.LocationRepository;
+import com.lieruce.goforlunch.repository.MockRestaurantRepository;
 import com.lieruce.goforlunch.repository.RestaurantRepository;
 import com.lieruce.goforlunch.repository.UserRepository;
 
@@ -18,6 +20,9 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     private final UserRepository userRepository;
     private final LocationRepository locationRepository;
     private final RestaurantRepository restaurantRepository;
+
+    // --- TOGGLE THIS TO SWITCH BETWEEN MOCK AND REAL GOOGLE ---
+    private static final boolean USE_MOCK = true;
 
     public static ViewModelFactory getInstance(Context context) {
         if (instance == null) {
@@ -34,7 +39,12 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         this.authRepository = AuthRepository.getInstance();
         this.userRepository = UserRepository.getInstance();
         this.locationRepository = LocationRepository.getInstance(context);
-        this.restaurantRepository = RestaurantRepository.getInstance(context);
+        
+        if (USE_MOCK) {
+            this.restaurantRepository = new MockRestaurantRepository();
+        } else {
+            this.restaurantRepository = GooglePlacesRepository.getInstance(context);
+        }
     }
 
     @NonNull

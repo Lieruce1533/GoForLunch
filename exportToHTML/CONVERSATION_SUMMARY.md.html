@@ -1,0 +1,85 @@
+<html>
+<head>
+<title>CONVERSATION_SUMMARY.md</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+CONVERSATION_SUMMARY.md</font>
+</center></td></tr></table>
+<pre><span class="s0"># </span><span class="s2">Go4Lunch - Conversation Summary &amp; Key Decisions</span>
+
+<span class="s2">This document summarizes the key technical discussions, troubleshooting steps, and architectural decisions made for the Go4Lunch project.</span>
+
+<span class="s0">## </span><span class="s2">Part 1</span><span class="s1">: </span><span class="s2">Initial Setup &amp; Troubleshooting</span>
+
+<span class="s0">### </span><span class="s2">1.1. Firebase Authentication &amp; App Launch Issues</span>
+
+<span class="s0">- </span><span class="s1">**</span><span class="s2">Problem</span><span class="s1">**: </span><span class="s2">The app would not launch after adding Firebase Authentication.</span>
+<span class="s0">- </span><span class="s1">**</span><span class="s2">Troubleshooting Steps &amp; Solutions</span><span class="s1">**:</span>
+    <span class="s0">1.  </span><span class="s1">**</span><span class="s2">AndroidManifest.xml</span><span class="s1">**: </span><span class="s2">The file was missing the `</span><span class="s1">&lt;</span><span class="s2">uses-permission android</span><span class="s1">:</span><span class="s2">name=</span><span class="s1">&quot;</span><span class="s2">android.permission.INTERNET</span><span class="s1">&quot; </span><span class="s2">/</span><span class="s1">&gt;</span><span class="s2">` permission and the `</span><span class="s1">&lt;activity&gt;</span><span class="s2">` declaration for the `com.firebase.ui.auth.AuthUIActivity`. Both were added.</span>
+    <span class="s0">2.  </span><span class="s1">**</span><span class="s2">Theme Incompatibility</span><span class="s1">**: </span><span class="s2">The app theme inherited from `NoActionBar`, which caused the `AuthUIActivity` to crash. The parent theme in `themes.xml` and `themes-night.xml` was changed to `Theme.Material3.DayNight` to provide the required `ActionBar`.</span>
+    <span class="s0">3.  </span><span class="s1">**</span><span class="s2">Emulator Installation Failure </span><span class="s1">(</span><span class="s2">`INSTALL_FAILED_VERIFICATION_FAILURE`</span><span class="s1">)**: </span><span class="s2">This was traced to a corrupted or untrusted debug signing key </span><span class="s1">(</span><span class="s2">`debug.keystore`</span><span class="s1">)</span><span class="s2">, likely caused by an Android Studio update. The solution was to delete the `</span><span class="s1">~</span><span class="s2">/.android/debug.keystore` file and let Android Studio generate a new, clean one.</span>
+
+<span class="s0">### </span><span class="s2">1.2. The </span><span class="s1">&quot;</span><span class="s2">SHA-1 Hell</span><span class="s1">&quot; </span><span class="s2">- Creating a Permanent Fix</span>
+
+<span class="s0">- </span><span class="s1">**</span><span class="s2">Problem</span><span class="s1">**: </span><span class="s2">Google Sign-In failed on a physical device because the app's SHA-1 fingerprint did not match the one registered in the Firebase console. The debug key changed after IDE updates, making this a recurring issue.</span>
+<span class="s0">- </span><span class="s1">**</span><span class="s2">The Permanent Solution</span><span class="s1">**:</span>
+    <span class="s0">1.  </span><span class="s1">**</span><span class="s2">Create a Dedicated Keystore</span><span class="s1">**: </span><span class="s2">We generated a new `debug.keystore` file </span><span class="s1">*</span><span class="s2">inside the project's `app` folder</span><span class="s1">*</span><span class="s2">.</span>
+    <span class="s0">2.  </span><span class="s1">**</span><span class="s2">Configure `build.gradle`</span><span class="s1">**: </span><span class="s2">The app-level `build.gradle` was modified to include a `signingConfigs.debug` block that explicitly points to this new, project-local `debug.keystore` file. This ensures every developer uses the same debug key, making the SHA-1 stable and consistent across all machines and updates.</span>
+    <span class="s0">3.  </span><span class="s1">**</span><span class="s2">Final Update</span><span class="s1">**: </span><span class="s2">The new, stable SHA-1 was registered in the Firebase console one last time.</span>
+
+<span class="s0">### </span><span class="s2">1.3. Gradle Build Failure </span><span class="s1">(</span><span class="s2">`Unsupported class file major version 69`</span><span class="s1">)</span>
+
+<span class="s0">- </span><span class="s1">**</span><span class="s2">Problem</span><span class="s1">**: </span><span class="s2">The `./gradlew signingReport` command failed with a Java version error.</span>
+<span class="s0">- </span><span class="s1">**</span><span class="s2">Explanation</span><span class="s1">**: </span><span class="s2">Gradle was being run with an incompatible, newer version of the Java JDK.</span>
+<span class="s0">- </span><span class="s1">**</span><span class="s2">Solution</span><span class="s1">**: </span><span class="s2">We forced Gradle to use a stable, compatible JDK by adding the `org.gradle.java.home` property to the `gradle.properties` file, pointing it to the JDK embedded within Android Studio </span><span class="s1">(</span><span class="s2">e.g., jbr-17</span><span class="s1">)</span><span class="s2">.</span>
+
+<span class="s0">### </span><span class="s2">1.4. Git Issues </span><span class="s1">(</span><span class="s2">`git rm`</span><span class="s1">)</span>
+
+<span class="s0">- </span><span class="s1">**</span><span class="s2">Problem</span><span class="s1">**: </span><span class="s2">The `gradle.properties` file was accidentally removed from the project via `git rm`.</span>
+<span class="s0">- </span><span class="s1">**</span><span class="s2">Solution</span><span class="s1">**: </span><span class="s2">The file was restored by first unstaging the deletion </span><span class="s1">(</span><span class="s2">`git restore --staged gradle.properties`</span><span class="s1">) </span><span class="s2">and then restoring the file itself </span><span class="s1">(</span><span class="s2">`git restore gradle.properties`</span><span class="s1">)</span><span class="s2">.</span>
+<span class="s0">- </span><span class="s1">**</span><span class="s2">Correct Way to Ignore Local Changes</span><span class="s1">**: </span><span class="s2">To ignore local-only changes to a tracked file </span><span class="s1">(</span><span class="s2">like adding the `org.gradle.java.home` property</span><span class="s1">)</span><span class="s2">, the correct command is `git update-index --assume-unchanged </span><span class="s1">&lt;file&gt;</span><span class="s2">`. The `.gitignore` file is for files that should never be tracked at all.</span>
+
+<span class="s0">## </span><span class="s2">Part 2</span><span class="s1">: </span><span class="s2">Architecture &amp; App Planning</span>
+
+<span class="s0">### </span><span class="s2">2.1. Core Architecture </span><span class="s1">(</span><span class="s2">MVVM</span><span class="s1">)</span>
+
+<span class="s0">- </span><span class="s1">**</span><span class="s2">Decision</span><span class="s1">**: </span><span class="s2">The app will follow the </span><span class="s1">**</span><span class="s2">Model-View-ViewModel </span><span class="s1">(</span><span class="s2">MVVM</span><span class="s1">)** </span><span class="s2">pattern.</span>
+<span class="s0">- </span><span class="s1">**</span><span class="s2">Implementation Steps</span><span class="s1">**:</span>
+    <span class="s0">1.  </span><span class="s1">**</span><span class="s2">Dependencies</span><span class="s1">**: </span><span class="s2">Added `lifecycle-viewmodel-ktx` and `lifecycle-livedata-ktx` to the project.</span>
+    <span class="s0">2.  </span><span class="s1">**</span><span class="s2">ViewModel Creation</span><span class="s1">**: </span><span class="s2">A `MainViewModel` was created to hold the app's UI logic.</span>
+    <span class="s0">3.  </span><span class="s1">**</span><span class="s2">LiveData</span><span class="s1">**: </span><span class="s2">The ViewModel now exposes the user's authentication state via `LiveData</span><span class="s1">&lt;FirebaseUser&gt;</span><span class="s2">`.</span>
+    <span class="s0">4.  </span><span class="s1">**</span><span class="s2">Activity as Observer</span><span class="s1">**: </span><span class="s2">The `MainActivity` was refactored to be a passive View. It simply observes the `LiveData` from the ViewModel and updates the UI accordingly </span><span class="s1">(</span><span class="s2">either shows a welcome message or launches the sign-in flow</span><span class="s1">)</span><span class="s2">. The complex logic was moved out of the Activity.</span>
+
+<span class="s0">### </span><span class="s2">2.2. Full App Blueprint &amp; Feature Plan</span>
+
+<span class="s0">- </span><span class="s1">**</span><span class="s2">Core Tools</span><span class="s1">**: </span><span class="s2">Hilt </span><span class="s1">(</span><span class="s2">Dependency Injection</span><span class="s1">) </span><span class="s2">and Retrofit </span><span class="s1">(</span><span class="s2">Networking</span><span class="s1">)</span><span class="s2">.</span>
+<span class="s0">- </span><span class="s1">**</span><span class="s2">High-Level Features</span><span class="s1">**:</span>
+    <span class="s0">1.  </span><span class="s1">**</span><span class="s2">Map View</span><span class="s1">**: </span><span class="s2">A map displaying nearby restaurants.</span>
+    <span class="s0">2.  </span><span class="s1">**</span><span class="s2">List View</span><span class="s1">**: </span><span class="s2">A `RecyclerView` listing the same restaurants.</span>
+    <span class="s0">3.  </span><span class="s1">**</span><span class="s2">Coworkers View</span><span class="s1">**: </span><span class="s2">A `RecyclerView` listing coworkers and their lunch choices.</span>
+    <span class="s0">4.  </span><span class="s1">**</span><span class="s2">Details View</span><span class="s1">**: </span><span class="s2">A detail screen for a selected restaurant.</span>
+    <span class="s0">5.  </span><span class="s1">**</span><span class="s2">Search</span><span class="s1">**: </span><span class="s2">A search bar to find specific restaurants.</span>
+
+<span class="s0">### </span><span class="s2">2.3. Detailed Firestore Schema Design</span>
+
+<span class="s0">- </span><span class="s1">**</span><span class="s2">`users` Collection</span><span class="s1">**: </span><span class="s2">Stores user-specific profile data.</span>
+    <span class="s0">- </span><span class="s1">*</span><span class="s2">Document ID</span><span class="s1">*: </span><span class="s2">`user.uid`</span>
+    <span class="s0">- </span><span class="s1">*</span><span class="s2">Fields</span><span class="s1">*: </span><span class="s2">`uid`, `username`, `avatarUrl`, `chosenRestaurantId`, `chosenRestaurantName`.</span>
+    <span class="s0">- </span><span class="s1">*</span><span class="s2">Subcollection</span><span class="s1">*: </span><span class="s2">`likedRestaurants` </span><span class="s1">(</span><span class="s2">stores a user's favorite restaurants</span><span class="s1">)</span><span class="s2">.</span>
+
+<span class="s0">- </span><span class="s1">**</span><span class="s2">`dailyChoices` Collection</span><span class="s1">**: </span><span class="s2">Tracks real-time lunch choices for the current day.</span>
+    <span class="s0">- </span><span class="s1">*</span><span class="s2">Document ID</span><span class="s1">*: </span><span class="s2">`restaurant.place_id`</span>
+    <span class="s0">- </span><span class="s1">*</span><span class="s2">Subcollection</span><span class="s1">*: </span><span class="s2">`attendees` </span><span class="s1">(</span><span class="s2">lists all users going to that restaurant</span><span class="s1">)</span><span class="s2">.</span>
+    <span class="s0">- </span><span class="s1">*</span><span class="s2">Denormalization</span><span class="s1">*: </span><span class="s2">The `attendees` documents will duplicate user `username` and `avatarUrl` for highly efficient queries, avoiding the need for multiple lookups.</span>
+</pre>
+</body>
+</html>

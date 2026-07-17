@@ -18,6 +18,7 @@ import androidx.navigation.Navigation;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -132,9 +133,18 @@ public class MapFragment extends Fragment {
         googleMap.clear();
         for (Restaurant restaurant : restaurants) {
             LatLng position = new LatLng(restaurant.getLatitude(), restaurant.getLongitude());
-            Marker marker = googleMap.addMarker(new MarkerOptions()
+            
+            MarkerOptions markerOptions = new MarkerOptions()
                     .position(position)
-                    .title(restaurant.getName()));
+                    .title(restaurant.getName());
+
+            // --- COLOR LOGIC ---
+            if (restaurant.getWorkmatesCount() > 0) {
+                // Someone is eating here!
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+            }
+
+            Marker marker = googleMap.addMarker(markerOptions);
             
             if (marker != null) {
                 marker.setTag(restaurant); // Store the restaurant object in the marker

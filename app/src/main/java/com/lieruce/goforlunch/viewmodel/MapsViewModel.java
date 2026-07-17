@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.lieruce.goforlunch.model.Restaurant;
 import com.lieruce.goforlunch.repository.LocationRepository;
+import com.lieruce.goforlunch.repository.MockRestaurantRepository;
 import com.lieruce.goforlunch.repository.RestaurantRepository;
 import com.lieruce.goforlunch.repository.UserRepository;
 
@@ -36,6 +37,15 @@ public class MapsViewModel extends ViewModel {
         this.locationRepository = locationRepository;
         this.restaurantRepository = restaurantRepository;
         this.userRepository = userRepository;
+
+        // --- SIMULATION TRICK ---
+        // Let's start at the Louvre (central to our mock restaurants)
+        if (restaurantRepository instanceof MockRestaurantRepository) {
+            Location louvre = new Location("mock");
+            louvre.setLatitude(48.8606);
+            louvre.setLongitude(2.3376);
+            manualLocation.setValue(louvre);
+        }
 
         // Combine GPS location and manual location
         locationToUse.addSource(locationRepository.getLocationLiveData(), location -> {

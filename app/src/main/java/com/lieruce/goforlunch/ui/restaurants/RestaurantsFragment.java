@@ -62,7 +62,7 @@ public class RestaurantsFragment extends Fragment implements RestaurantAdapter.O
         }
 
         // Observe user location to calculate distance
-        mapsViewModel.getUserLocation().observe(getViewLifecycleOwner(), location -> {
+        mapsViewModel.getLocationToUse().observe(getViewLifecycleOwner(), location -> {
             if (location != null) {
                 adapter.setUserLocation(location);
             }
