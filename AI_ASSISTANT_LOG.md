@@ -302,3 +302,13 @@
     *   **Action (UI)**: Updated `RestaurantsFragment` to use the simulated location for distance calculations, ensuring realistic "nearby" data.
     *   **Action (Map)**: Implemented **Dynamic Marker Coloring**. Markers now turn **Green** if at least one person (including the current user) has selected that restaurant, providing immediate visual feedback.
     *   **Benefit**: The developer can now build, test, and present the app with high-quality data and zero financial risk.
+
+## Session: 2026-07-18
+
+### Summary of Work:
+
+*   **Session Start**: Initialized the development session and reviewed the project's ground rules (`AGENT_RULES.md`) and architectural status (`APP_ARCHITECTURE_PLAN.md`, `ARCHITECTURAL_SHIFTS.md`).
+*   **Documentation Consolidation**: Merged `ARCHITECTURAL_SHIFTS.md` into `APP_ARCHITECTURE_PLAN.md`.
+    *   **Action**: Updated `APP_ARCHITECTURE_PLAN.md` with modern rationales for Manual DI, Places SDK, and Single-Activity Architecture, preparing the documentation for jury review.
+    *   **Action**: Deleted the redundant `ARCHITECTURAL_SHIFTS.md` file.
+*   **Documentation**: Updated the development log to start the new session.

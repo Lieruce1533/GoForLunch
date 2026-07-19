@@ -15,11 +15,14 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.SetOptions;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Map;
@@ -28,6 +31,7 @@ import java.util.Map;
 public class UserRepositoryTest {
 
     private UserRepository userRepository;
+    private MockedStatic<Uri> mockedUri;
 
     @Mock
     private CollectionReference mockCollection;
@@ -43,11 +47,22 @@ public class UserRepositoryTest {
         // Initialize mocks annotated with @Mock
         MockitoAnnotations.openMocks(this);
         
+        // Mock static Uri.parse
+        mockedUri = Mockito.mockStatic(Uri.class);
+        mockedUri.when(() -> Uri.parse(anyString())).thenReturn(mock(Uri.class));
+
         // Arrange: tell the mock collection to return a mock document when document() is called
         when(mockCollection.document(anyString())).thenReturn(mockDocument);
         
         // Initialize our repository with the mock collection
         userRepository = new UserRepository(mockCollection);
+    }
+
+    @After
+    public void tearDown() {
+        if (mockedUri != null) {
+            mockedUri.close();
+        }
     }
 
     @Test
@@ -88,8 +103,9 @@ public class UserRepositoryTest {
 
         // 3. Assert
         // The repository should extract "fabien" from the email
-        verify(mockDocument).set(org.mockito.ArgumentMatchers.argThat(map -> 
-            "fabien".equals(map.get("username"))
-        ), eq(SetOptions.merge()));
+        verify(mockDocument).set(org.mockito.ArgumentMatchers.argThat(argument -> {
+            Map<String, Object> map = (Map<String, Object>) argument;
+            return "fabien".equals(map.get("username"));
+        }), eq(SetOptions.merge()));
     }
 }

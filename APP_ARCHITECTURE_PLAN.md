@@ -1,74 +1,70 @@
 # Go4Lunch - Architectural & Development Plan
 
-This document outlines the architectural strategy and step-by-step plan for building the Go4Lunch application.
+This document outlines the architectural strategy, technical choices, and development roadmap for the Go4Lunch application.
 
-## 1. Core Principles & Tools
+## 1. Core Principles & Modern Tooling
 
-- **Architecture**: Model-View-ViewModel (MVVM) will be used to ensure a clean separation of concerns, making the app testable and maintainable.
-- **Dependency Injection**: Hilt will be used to manage dependencies, simplifying the creation of objects and promoting decoupled code.
-- **Networking**: Retrofit will be used to handle all network calls to the Google Places API.
-- **Data Persistence & Backend**: Firebase Firestore will be used to store app-specific data like user profiles and restaurant choices.
-- **API Cost & Performance**: API calls to paid services like Google Places will be optimized. We will implement a caching strategy to fetch data only once per session, reducing costs and data consumption.
+- **Architecture**: **Model-View-ViewModel (MVVM)** is used to ensure a clean separation of concerns, making the app testable and maintainable.
+- **Dependency Injection**: **Manual Dependency Injection** via a central `ViewModelFactory`. This approach prioritizes transparency and a deep understanding of object lifecycles over library-based "magic."
+- **Networking & Data**: **Google Places SDK for Android**. Instead of manual REST calls, we leverage the official SDK for robust, type-safe, and optimized interaction with Google's location services.
+- **UI Architecture**: **Single-Activity Architecture**. The entire application flows through a single `MainActivity` using the **Jetpack Navigation Component** to manage Fragments and back-stack logic.
+- **Data Persistence & Backend**: **Firebase Firestore** is used for real-time, app-specific data (user profiles, daily restaurant choices, and social interactions).
+- **API Cost & Performance**: Optimized via a **Repository Pattern** and a **Mock Data Strategy**. We implement caching and simulated data providers to ensure $0 development costs while maintaining high performance.
 
-## 2. Data Strategy: Combining Two Sources
+---
 
-The app will use two primary data sources. The **Repository Pattern** will be the core of our strategy to manage and combine them.
+## 2. Architectural Rationales (Jury Presentation)
 
-- **Google Places API (Public Data Source)**:
-  - Provides static information about restaurants (name, address, photo, phone number, rating).
-  - This data will **not** be stored in our database. It will be fetched fresh to ensure it's always up-to-date.
+During development, several strategic decisions were made to modernize the project beyond the original 2022/2023 requirements. These choices demonstrate technical maturity and adaptation to the current Android ecosystem.
 
-- **Firebase Firestore (Private Data Source)**:
-  - Provides dynamic, app-specific data.
-  - Answers questions like: "Who are my users?", "Which restaurant did User X choose today?"
+### A. Manual DI vs. Hilt/Dagger
+*   **Choice**: Manual Injection using a Singleton `ViewModelFactory`.
+*   **Rationale**: While Hilt is standard for enterprise scale, manual DI demonstrates a fundamental mastery of the **Dependency Inversion Principle**. By manually managing dependencies, we ensure full control over object creation and avoid the overhead/complexity of annotation processing for this specific use case. It makes the architecture "transparent" for educational and evaluation purposes.
 
-- **The `Repository`'s Role**:
-  - The ViewModel will ask the Repository for data (e.g., "Get me a list of restaurants with coworker info").
-  - The Repository will intelligently fetch restaurant info from the Places API and user choice info from Firestore, then merge them into a single, unified data model for the UI.
+### B. Google Places SDK vs. Retrofit
+*   **Choice**: Official Google Places SDK.
+*   **Rationale**: Retrofit is a tool for building clients for raw REST APIs. However, Google provides a dedicated SDK that offers higher-level abstractions (returning `Place` objects instead of JSON), built-in security, and optimized networking specifically for their services. Using the SDK is the "official" and more robust industry practice.
 
-## 3. Proposed Firestore Database Structure
+### C. Single-Activity Architecture
+*   **Choice**: Jetpack Navigation Component.
+*   **Rationale**: Multiple Activities are now considered legacy for standard apps. A Single-Activity approach provides smoother transitions, easier data sharing via Activity-scoped ViewModels, and follows Google's "Modern Android Development" (MAD) recommendations.
 
-- **`users` collection**:
-  - Each document is a user, keyed by their Firebase Auth `uid`.
-  - Fields: `username`, `avatarUrl`, `chosenRestaurantId` (the Google `place_id`), `chosenRestaurantName`.
+---
 
-- **`restaurants` collection (for tracking daily choices)**:
-  - Each document ID is the Google `place_id` of a restaurant.
-  - Will contain a subcollection named `goingUsers` that lists which users have decided to eat at that restaurant for the day.
+## 3. Data Strategy: Hybrid Repository Pattern
 
-## 4. Phased Development Plan
+The app uses a **Repository Pattern** to unify two distinct data streams:
 
-We will build the app feature by feature in the following phases.
+1.  **Public Data (Google Places)**: Static info (names, addresses, ratings). Fetched fresh or simulated via `MockRestaurantRepository` for cost efficiency.
+2.  **Private Data (Firebase Firestore)**: Dynamic social info (Who is eating where? Who "liked" this place?).
 
-### Phase 1: The Foundation - Displaying Restaurants on a Map
+The **Repository** merges these streams into a single UI-ready model, shielding the ViewModel from the complexity of the data sources.
 
-This is the most critical phase that sets up all the core components.
+---
 
-1.  **Dependencies & Setup**: Add Hilt, Retrofit, Google Maps, and Location Services libraries to the Gradle files.
-2.  **Hilt Setup**: Create a custom `Application` class and necessary Hilt modules.
-3.  **Location Service**: Create a `LocationProvider` to handle permissions and fetch the user's current GPS location.
-4.  **Networking (Retrofit)**: Define a `RestaurantApiService` interface for the Places API and create the data classes (POJOs) to match the API's JSON response.
-5.  **Data Layer**: Create the `RestaurantRepository` that will use the `RestaurantApiService` to fetch restaurant data.
-6.  **ViewModel & UI**: Create a `MapViewModel` that gets data from the Repository and a `MapFragment` that observes the ViewModel to display restaurant markers.
+## 4. Development Status & Phased Plan
 
-### Phase 2: Restaurant List & Details View
+### Phase 1: Foundation & Navigation [COMPLETED]
+- [x] Single-Activity setup with `BottomNavigationView`.
+- [x] Firebase Authentication (Google Sign-In) integration.
+- [x] Base `UserRepository` with Firestore "upsert" logic.
 
-1.  **Restaurant List**: Create a `RestaurantListFragment` with a `RecyclerView`. It will reuse the existing `MapViewModel` to display the same list of restaurants fetched in Phase 1.
-2.  **Restaurant Details**: Create a `RestaurantDetailActivity` that shows detailed information about a restaurant when one is selected. This will involve a new API call to get specific details for that restaurant.
+### Phase 2: Location & Restaurants [COMPLETED]
+- [x] `LocationRepository` for GPS management.
+- [x] `RestaurantRepository` (Interface) with `GooglePlaces` and `Mock` implementations.
+- [x] **Map View**: Reactive marker coloring based on social data.
+- [x] **List View**: RecyclerView with real-time distance and opening hours.
 
-### Phase 3: Coworkers View
+### Phase 3: Social & Details [COMPLETED]
+- [x] **Restaurant Details**: Real photos, phone/website intents, and workmate lists.
+- [x] **Workmates Tab**: Global real-time list of colleagues and their choices.
+- [x] Selection logic: "I'm eating here" vs. "I changed my mind."
 
-1.  **Firestore Setup**: Implement the `users` collection in Firestore.
-2.  **Data Layer**: Create a `UserRepository` to fetch coworker data from Firestore.
-3.  **ViewModel & UI**: Create a `CoworkersFragment` and a corresponding `CoworkersViewModel` to display a list of coworkers, their avatars, and their chosen restaurants for the day.
+### Phase 4: Polish & Advanced Features [IN PROGRESS]
+- [/] **Search**: Reactive local filtering for maps and lists.
+- [/] **Settings**: Notifications toggle and French/English localization.
+- [ ] **Notifications**: Daily reminder at 12:00 PM (using WorkManager).
 
-### Phase 4: Additional Features
-
-- **Search**: Implement a search bar to filter restaurants.
-- **UI/UX Polish**: Implement optional features like making phone calls or launching Google Maps for directions from the detail view.
-
-### Phase 5: Testing & Quality Assurance
-
-1.  **Unit Testing**: Implement unit tests for the Repositories (`UserRepository`, `RestaurantRepository`) and ViewModels (`MainViewModel`, `MapsViewModel`, `WorkmatesViewModel`) to ensure business logic is correct. Use Mockito to mock dependencies.
-2.  **Instrumented Testing (Espresso)**: Create UI tests to verify the navigation flow (Bottom Navigation, Drawer) and key user interactions (Login, Restaurant selection).
-3.  **Edge Case Verification**: Test app behavior with no internet connection, GPS disabled, and denied permissions.
+### Phase 5: Quality Assurance [IN PROGRESS]
+- [/] **Unit Testing**: Repositories and ViewModels. (See [Testing Roadmap](file:///home/flint/.cache/Google/AndroidStudio2026.1.2/projects/go4lunch.cfea1f15/.artifacts/1a1e91c4-5a45-4afe-8c99-cb9926ebc82f/testing_roadmap.artifact.md))
+- [ ] **Instrumented Testing**: Navigation flow and edge cases (offline mode).
