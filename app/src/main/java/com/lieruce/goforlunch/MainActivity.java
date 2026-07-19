@@ -176,6 +176,20 @@ public class MainActivity extends AppCompatActivity {
             NavigationUI.setupWithNavController(binding.bottomNavigation, navController);
             NavigationUI.setupWithNavController(binding.navView, navController);
 
+            // Force return to list if clicking the tab while in details
+            binding.bottomNavigation.setOnItemSelectedListener(item -> {
+                int currentId = navController.getCurrentDestination() != null ? navController.getCurrentDestination().getId() : -1;
+                if (currentId == R.id.restaurantDetailFragment && item.getItemId() == R.id.navigation_restaurants) {
+                    navController.popBackStack(R.id.navigation_restaurants, false);
+                    return true;
+                }
+                if (currentId == R.id.restaurantDetailFragment && item.getItemId() == R.id.navigation_map) {
+                    navController.popBackStack(R.id.navigation_map, false);
+                    return true;
+                }
+                return NavigationUI.onNavDestinationSelected(item, navController);
+            });
+
             // Listen for destination changes to show/hide search bar
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
                 if (destination.getId() == R.id.navigation_map || destination.getId() == R.id.navigation_restaurants) {

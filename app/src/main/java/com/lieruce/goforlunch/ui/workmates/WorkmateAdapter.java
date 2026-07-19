@@ -24,9 +24,11 @@ public class WorkmateAdapter extends RecyclerView.Adapter<WorkmateAdapter.Workma
     }
 
     private final OnWorkmateClickListener listener;
+    private final String currentUserId;
     private List<User> workmates = new ArrayList<>();
 
-    public WorkmateAdapter(OnWorkmateClickListener listener) {
+    public WorkmateAdapter(String currentUserId, OnWorkmateClickListener listener) {
+        this.currentUserId = currentUserId;
         this.listener = listener;
     }
 
@@ -46,7 +48,7 @@ public class WorkmateAdapter extends RecyclerView.Adapter<WorkmateAdapter.Workma
     @Override
     public void onBindViewHolder(@NonNull WorkmateViewHolder holder, int position) {
         User user = workmates.get(position);
-        holder.bind(user);
+        holder.bind(user, currentUserId);
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onWorkmateClick(user);
@@ -67,8 +69,14 @@ public class WorkmateAdapter extends RecyclerView.Adapter<WorkmateAdapter.Workma
             this.binding = binding;
         }
 
-        public void bind(User user) {
+        public void bind(User user, String currentUserId) {
             String username = user.getUsername() != null ? user.getUsername() : "A coworker";
+            
+            // Add (Me) label if it's the current user
+            if (user.getUid() != null && user.getUid().equals(currentUserId)) {
+                username += " (" + binding.getRoot().getContext().getString(R.string.me) + ")";
+            }
+
             String status;
             
             // Get standard theme colors
@@ -79,11 +87,11 @@ public class WorkmateAdapter extends RecyclerView.Adapter<WorkmateAdapter.Workma
                 String restaurantName = user.getChosenRestaurantName() != null ? user.getChosenRestaurantName() : "a restaurant";
                 status = username + " is eating at (" + restaurantName + ")";
                 binding.workmateStatus.setTextColor(colorOnSurface);
-                binding.workmateStatus.setTypeface(null, Typeface.NORMAL);
+                binding.workmateStatus.setTypeface(null, Typeface.BOLD); // ACTIVE = BOLD
             } else {
                 status = username + " hasn't decided yet";
                 binding.workmateStatus.setTextColor(colorOnSurfaceVariant);
-                binding.workmateStatus.setTypeface(null, Typeface.ITALIC);
+                binding.workmateStatus.setTypeface(null, Typeface.ITALIC); // INACTIVE = ITALIC/GRAY
             }
             binding.workmateStatus.setText(status);
 

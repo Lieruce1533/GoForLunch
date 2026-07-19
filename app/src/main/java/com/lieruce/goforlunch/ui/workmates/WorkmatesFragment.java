@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.lieruce.goforlunch.R;
 import com.lieruce.goforlunch.databinding.FragmentWorkmatesBinding;
 import com.lieruce.goforlunch.model.User;
+import com.lieruce.goforlunch.repository.AuthRepository;
 import com.lieruce.goforlunch.viewmodel.ViewModelFactory;
 import com.lieruce.goforlunch.viewmodel.WorkmatesViewModel;
 
@@ -47,7 +48,10 @@ public class WorkmatesFragment extends Fragment implements WorkmateAdapter.OnWor
     }
 
     private void setupRecyclerView() {
-        adapter = new WorkmateAdapter(this);
+        String currentUserId = AuthRepository.getInstance().getCurrentUser() != null 
+                ? AuthRepository.getInstance().getCurrentUser().getUid() 
+                : null;
+        adapter = new WorkmateAdapter(currentUserId, this);
         binding.workmatesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.workmatesRecyclerView.setAdapter(adapter);
     }

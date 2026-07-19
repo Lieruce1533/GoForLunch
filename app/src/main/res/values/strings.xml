@@ -36,4 +36,5 @@
     <string name="french">French</string>
     <string name="english_flag">🇺🇸 EN</string>
     <string name="french_flag">FR 🇫🇷</string>
+    <string name="me">Me</string>
 </resources>

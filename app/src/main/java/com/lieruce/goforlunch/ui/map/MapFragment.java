@@ -75,7 +75,7 @@ public class MapFragment extends Fragment {
         viewModel.getLocationToUse().observe(getViewLifecycleOwner(), location -> {
             if (location != null && !isInitialLocationSet) {
                 LatLng userLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 15f));
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 13f));
                 isInitialLocationSet = true;
             }
         });
