@@ -3,6 +3,10 @@ package com.lieruce.goforlunch.ui.map;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +22,7 @@ import androidx.navigation.Navigation;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -139,10 +144,15 @@ public class MapFragment extends Fragment {
                     .title(restaurant.getName());
 
             // --- COLOR LOGIC ---
+            int markerColor;
             if (restaurant.getWorkmatesCount() > 0) {
                 // Someone is eating here!
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                markerColor = ContextCompat.getColor(requireContext(), R.color.colorMarkerGreen);
+            } else {
+                markerColor = ContextCompat.getColor(requireContext(), R.color.colorMarkerRed);
             }
+            
+            markerOptions.icon(getBitmapDescriptorFromVector(markerColor));
 
             Marker marker = googleMap.addMarker(markerOptions);
             
@@ -156,6 +166,46 @@ public class MapFragment extends Fragment {
         Bundle args = new Bundle();
         args.putString("restaurantId", restaurantId);
         Navigation.findNavController(requireView()).navigate(R.id.action_navigation_map_to_restaurantDetailFragment, args);
+    }
+
+    private BitmapDescriptor getBitmapDescriptorFromVector(int color) {
+        Drawable background = ContextCompat.getDrawable(requireContext(), R.drawable.ic_map_pin_shape);
+        Drawable icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_default_restaurant);
+        
+        if (background == null || icon == null) return BitmapDescriptorFactory.defaultMarker();
+
+        // 1. Prepare background (the pin)
+        background.setTint(color);
+        int width = background.getIntrinsicWidth() * 2; // Make it bigger for better resolution
+        int height = background.getIntrinsicHeight() * 2;
+        background.setBounds(0, 0, width, height);
+
+        // 2. Prepare icon (fork & knife)
+        icon.setTint(darkenColor(color, 0.7f)); // 30% darker than background
+        // Center it in the pin head (top part)
+        int iconSize = (int) (width * 0.5);
+        int left = (width - iconSize) / 2;
+        int top = (int) (height * 0.15); // Slightly down from top
+        icon.setBounds(left, top, left + iconSize, top + iconSize);
+
+        // 3. Create bitmap and draw
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        background.draw(canvas);
+        icon.draw(canvas);
+
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    private int darkenColor(int color, float factor) {
+        int a = Color.alpha(color);
+        int r = Math.round(Color.red(color) * factor);
+        int g = Math.round(Color.green(color) * factor);
+        int b = Math.round(Color.blue(color) * factor);
+        return Color.argb(a,
+                Math.min(r, 255),
+                Math.min(g, 255),
+                Math.min(b, 255));
     }
 
     @Override

@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.RestaurantViewHolder> {
 
@@ -83,7 +85,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Re
             float normalizedRating = (float) (restaurant.getRating() * 3.0 / 5.0);
             binding.restaurantRating.setRating(normalizedRating);
 
-            binding.restaurantHours.setText(restaurant.getOpeningHours());
+            binding.restaurantHours.setText(formatOpeningHours(restaurant.getOpeningHours()));
 
             // --- Distance Calculation ---
             if (userLocation != null) {
@@ -116,6 +118,38 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Re
                     .error(R.drawable.ic_default_restaurant)
                     .centerCrop()
                     .into(binding.restaurantPhoto);
+        }
+
+        private String formatOpeningHours(String rawHours) {
+            if (rawHours == null || rawHours.isEmpty()) return "";
+            
+            android.content.Context context = binding.getRoot().getContext();
+
+            // Handle "Open 24/7"
+            if (rawHours.equalsIgnoreCase("Open 24/7")) {
+                return context.getString(R.string.restaurant_open_24_7);
+            }
+
+            // Handle "Open until HH:mm"
+            Pattern openUntilPattern = Pattern.compile("Open until (\\d{1,2}:\\d{2})", Pattern.CASE_INSENSITIVE);
+            Matcher openUntilMatcher = openUntilPattern.matcher(rawHours);
+            if (openUntilMatcher.find()) {
+                return context.getString(R.string.restaurant_open_until, openUntilMatcher.group(1));
+            }
+
+            // Handle "Closed - Opens HH:mm ..."
+            Pattern opensAtPattern = Pattern.compile("Closed - Opens (\\d{1,2}:\\d{2}.*)", Pattern.CASE_INSENSITIVE);
+            Matcher opensAtMatcher = opensAtPattern.matcher(rawHours);
+            if (opensAtMatcher.find()) {
+                return context.getString(R.string.restaurant_closed_opens, opensAtMatcher.group(1));
+            }
+
+            // Fallback for general "Closed"
+            if (rawHours.equalsIgnoreCase("Closed")) {
+                return context.getString(R.string.restaurant_closed);
+            }
+
+            return rawHours; // Return original if no pattern matched
         }
     }
 

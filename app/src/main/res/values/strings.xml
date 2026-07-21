@@ -37,4 +37,12 @@
     <string name="english_flag">🇺🇸 EN</string>
     <string name="french_flag">FR 🇫🇷</string>
     <string name="me">Me</string>
+    <string name="test_notification">Test Notification</string>
+    <string name="test_notification_desc">Triggers a lunch reminder immediately for testing.</string>
+    <string name="workmate_status_decided">%1$s is eating at (%2$s)</string>
+    <string name="workmate_status_undecided">%1$s hasn\'t decided yet</string>
+    <string name="restaurant_open_until">Open until %1$s</string>
+    <string name="restaurant_closed_opens">Closed - Opens %1$s</string>
+    <string name="restaurant_open_24_7">Open 24/7</string>
+    <string name="restaurant_closed">Closed</string>
 </resources>

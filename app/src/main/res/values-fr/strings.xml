@@ -37,4 +37,12 @@
     <string name="english_flag">🇺🇸 EN</string>
     <string name="french_flag">FR 🇫🇷</string>
     <string name="me">Moi</string>
+    <string name="test_notification">Tester la notification</string>
+    <string name="test_notification_desc">Déclenche un rappel de déjeuner immédiatement pour tester.</string>
+    <string name="workmate_status_decided">%1$s mange à (%2$s)</string>
+    <string name="workmate_status_undecided">%1$s n\'a pas encore décidé</string>
+    <string name="restaurant_open_until">Ouvert jusqu\'à %1$s</string>
+    <string name="restaurant_closed_opens">Fermé - Ouvre à %1$s</string>
+    <string name="restaurant_open_24_7">Ouvert 24h/24</string>
+    <string name="restaurant_closed">Fermé</string>
 </resources>

@@ -311,4 +311,33 @@
 *   **Documentation Consolidation**: Merged `ARCHITECTURAL_SHIFTS.md` into `APP_ARCHITECTURE_PLAN.md`.
     *   **Action**: Updated `APP_ARCHITECTURE_PLAN.md` with modern rationales for Manual DI, Places SDK, and Single-Activity Architecture, preparing the documentation for jury review.
     *   **Action**: Deleted the redundant `ARCHITECTURAL_SHIFTS.md` file.
-*   **Documentation**: Updated the development log to start the new session.
+*   **Phase 5: Testing Implementation**:
+    *   **Action (Unit Tests)**: Implemented 7 logic tests for `UserRepository`, `AuthRepository`, and ViewModels.
+    *   **Action (UI Tests)**: Implemented 4 instrumented tests for navigation and detail flows.
+    *   **Action (Fix)**: Resolved a major dependency conflict between Firestore and Espresso-contrib (Protobuf).
+
+## Session: 2026-07-19
+
+### Summary of Work:
+
+*   **UI/UX Refinements**:
+    *   **Action (Map)**: Optimized initial zoom level (13f) for better restaurant visibility.
+    *   **Action (Navigation)**: Implemented a universal "pop-on-click" logic for the Bottom Navigation, ensuring consistent behavior when exiting the Detail screen from any tab.
+    *   **Action (Workmates)**: Added "(Me)" label and visual bold/italic distinction for active lunch choices.
+    *   **Action (Identity)**: Added "(Me)" label to the Navigation Drawer header with email fallback logic.
+    *   **Action (Localization)**: Introduced localized string templates for dynamic status messages and opening hours (English/French).
+    *   **Action (Testing)**: Added a "Test Notification" button in Settings for immediate WorkManager demonstration.
+*   **Git Cleanup & Synchronization**:
+    *   **Action**: Merged `feature/unit-tests` into `develop` and pushed to remote.
+    *   **Action**: Created a new `feature/final-polishing` branch for the project wrap-up.
+    *   **Action**: Deleted local merged feature branches to declutter the workspace.
+
+## Session: 2026-07-21
+
+### Summary of Work:
+
+*   **UI/UX Final Polish**:
+    *   **Action (Map)**: Implemented custom "Pimped" map markers with a fork and knife icon. Added dynamic color math to darken icons relative to their pin background for an integrated look.
+    *   **Action (Search)**: Implemented synchronized global filtering for the Workmates list, allowing users to search for colleagues by restaurant name.
+*   **Git Management**:
+    *   **Action**: Saved progress on the `feature/final-polishing` branch.

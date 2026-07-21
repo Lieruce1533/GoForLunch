@@ -38,6 +38,7 @@ import com.lieruce.goforlunch.repository.LocationRepository;
 import com.lieruce.goforlunch.viewmodel.MainViewModel;
 import com.lieruce.goforlunch.viewmodel.MapsViewModel;
 import com.lieruce.goforlunch.viewmodel.ViewModelFactory;
+import com.lieruce.goforlunch.viewmodel.WorkmatesViewModel;
 import com.lieruce.goforlunch.worker.WorkManagerHelper;
 
 import java.util.Arrays;
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
     private MainViewModel mainViewModel;
     private MapsViewModel mapsViewModel;
+    private WorkmatesViewModel workmatesViewModel;
     private ActivityMainBinding binding;
     private NavController navController;
     private AppBarConfiguration appBarConfiguration;
@@ -93,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
         ViewModelFactory factory = ViewModelFactory.getInstance(this);
         mainViewModel = new ViewModelProvider(this, factory).get(MainViewModel.class);
         mapsViewModel = new ViewModelProvider(this, factory).get(MapsViewModel.class);
+        workmatesViewModel = new ViewModelProvider(this, factory).get(WorkmatesViewModel.class);
 
         setupToolbar();
         setupNavigation(); // Initialize navigation once at the start
@@ -176,23 +179,20 @@ public class MainActivity extends AppCompatActivity {
             NavigationUI.setupWithNavController(binding.bottomNavigation, navController);
             NavigationUI.setupWithNavController(binding.navView, navController);
 
-            // Force return to list if clicking the tab while in details
+            // Force return to list/map/workmates if clicking the tab while in details
             binding.bottomNavigation.setOnItemSelectedListener(item -> {
                 int currentId = navController.getCurrentDestination() != null ? navController.getCurrentDestination().getId() : -1;
-                if (currentId == R.id.restaurantDetailFragment && item.getItemId() == R.id.navigation_restaurants) {
-                    navController.popBackStack(R.id.navigation_restaurants, false);
-                    return true;
-                }
-                if (currentId == R.id.restaurantDetailFragment && item.getItemId() == R.id.navigation_map) {
-                    navController.popBackStack(R.id.navigation_map, false);
-                    return true;
+                if (currentId == R.id.restaurantDetailFragment) {
+                    navController.popBackStack();
                 }
                 return NavigationUI.onNavDestinationSelected(item, navController);
             });
 
             // Listen for destination changes to show/hide search bar
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-                if (destination.getId() == R.id.navigation_map || destination.getId() == R.id.navigation_restaurants) {
+                if (destination.getId() == R.id.navigation_map || 
+                    destination.getId() == R.id.navigation_restaurants ||
+                    destination.getId() == R.id.navigation_workmates) {
                     showSearchMenu();
                 } else {
                     hideSearchMenu();
@@ -217,11 +217,13 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public boolean onQueryTextSubmit(String query) {
                                 mapsViewModel.setSearchQuery(query);
+                                workmatesViewModel.setSearchQuery(query);
                                 return true;
                             }
                             @Override
                             public boolean onQueryTextChange(String newText) {
                                 mapsViewModel.setSearchQuery(newText);
+                                workmatesViewModel.setSearchQuery(newText);
                                 return true;
                             }
                         });
@@ -243,6 +245,7 @@ public class MainActivity extends AppCompatActivity {
             currentMenuProvider = null;
             // Clear search query when leaving searchable fragments
             mapsViewModel.setSearchQuery("");
+            workmatesViewModel.setSearchQuery("");
         }
     }
 
@@ -284,7 +287,16 @@ public class MainActivity extends AppCompatActivity {
 
         mainViewModel.getUserLiveData().observe(this, firebaseUser -> {
             if (firebaseUser != null) {
-                nameView.setText(firebaseUser.getDisplayName());
+                String name = firebaseUser.getDisplayName();
+                if ((name == null || name.isEmpty()) && firebaseUser.getEmail() != null) {
+                    name = firebaseUser.getEmail().split("@")[0];
+                }
+                if (name == null || name.isEmpty()) {
+                    name = "Anonymous";
+                }
+
+                String nameWithMe = name + " (" + getString(R.string.me) + ")";
+                nameView.setText(nameWithMe);
                 emailView.setText(firebaseUser.getEmail());
                 Glide.with(this)
                         .load(firebaseUser.getPhotoUrl())

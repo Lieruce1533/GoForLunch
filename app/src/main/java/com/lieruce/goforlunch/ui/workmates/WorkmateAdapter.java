@@ -85,11 +85,11 @@ public class WorkmateAdapter extends RecyclerView.Adapter<WorkmateAdapter.Workma
 
             if (user.getChosenRestaurantId() != null && !user.getChosenRestaurantId().isEmpty()) {
                 String restaurantName = user.getChosenRestaurantName() != null ? user.getChosenRestaurantName() : "a restaurant";
-                status = username + " is eating at (" + restaurantName + ")";
+                status = binding.getRoot().getContext().getString(R.string.workmate_status_decided, username, restaurantName);
                 binding.workmateStatus.setTextColor(colorOnSurface);
                 binding.workmateStatus.setTypeface(null, Typeface.BOLD); // ACTIVE = BOLD
             } else {
-                status = username + " hasn't decided yet";
+                status = binding.getRoot().getContext().getString(R.string.workmate_status_undecided, username);
                 binding.workmateStatus.setTextColor(colorOnSurfaceVariant);
                 binding.workmateStatus.setTypeface(null, Typeface.ITALIC); // INACTIVE = ITALIC/GRAY
             }

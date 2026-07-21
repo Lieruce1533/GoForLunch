@@ -46,6 +46,10 @@ public class SettingsFragment extends Fragment {
             }
         });
 
+        binding.btnTestNotification.setOnClickListener(v -> {
+            WorkManagerHelper.runTestNotification(requireContext());
+        });
+
         // --- LANGUAGE SWITCH ---
         // 1. Get current app locale
         LocaleListCompat currentAppLocales = AppCompatDelegate.getApplicationLocales();

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
@@ -55,5 +56,11 @@ public class WorkManagerHelper {
 
     public static void cancelLunchReminder(Context context) {
         WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME);
+    }
+
+    public static void runTestNotification(Context context) {
+        OneTimeWorkRequest testRequest = new OneTimeWorkRequest.Builder(NotificationWorker.class)
+                .build();
+        WorkManager.getInstance(context).enqueue(testRequest);
     }
 }

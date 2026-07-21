@@ -44,7 +44,7 @@ public class WorkmatesFragment extends Fragment implements WorkmateAdapter.OnWor
 
     private void setupViewModel() {
         ViewModelFactory factory = ViewModelFactory.getInstance(requireContext());
-        viewModel = new ViewModelProvider(this, factory).get(WorkmatesViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity(), factory).get(WorkmatesViewModel.class);
     }
 
     private void setupRecyclerView() {

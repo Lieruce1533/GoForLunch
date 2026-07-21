@@ -27,6 +27,22 @@
         android:textSize="12sp"
         android:layout_marginTop="4dp"/>
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_test_notification"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/test_notification" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/test_notification_desc"
+        android:textSize="12sp"
+        android:layout_marginTop="4dp"
+        android:textStyle="italic"/>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
