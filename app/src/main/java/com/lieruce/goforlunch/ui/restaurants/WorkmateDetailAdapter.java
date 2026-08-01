@@ -18,7 +18,12 @@ import java.util.Objects;
 
 public class WorkmateDetailAdapter extends RecyclerView.Adapter<WorkmateDetailAdapter.WorkmateViewHolder> {
 
+    private final String currentUserId;
     private List<User> workmates = new ArrayList<>();
+
+    public WorkmateDetailAdapter(String currentUserId) {
+        this.currentUserId = currentUserId;
+    }
 
     public void setWorkmates(List<User> newWorkmates) {
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new WorkmateDiffCallback(this.workmates, newWorkmates));
@@ -35,7 +40,7 @@ public class WorkmateDetailAdapter extends RecyclerView.Adapter<WorkmateDetailAd
 
     @Override
     public void onBindViewHolder(@NonNull WorkmateViewHolder holder, int position) {
-        holder.bind(workmates.get(position));
+        holder.bind(workmates.get(position), currentUserId);
     }
 
     @Override
@@ -51,10 +56,14 @@ public class WorkmateDetailAdapter extends RecyclerView.Adapter<WorkmateDetailAd
             this.binding = binding;
         }
 
-        public void bind(User user) {
+        public void bind(User user, String currentUserId) {
             String username = user.getUsername() != null ? user.getUsername() : "A coworker";
-            String joiningText = username + " is joining!";
-            binding.workmateName.setText(joiningText);
+            
+            if (user.getUid() != null && user.getUid().equals(currentUserId)) {
+                username = binding.getRoot().getContext().getString(R.string.me);
+            }
+            
+            binding.workmateName.setText(username);
 
             Glide.with(binding.workmateAvatar.getContext())
                     .load(user.getAvatarUrl())

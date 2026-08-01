@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.lieruce.goforlunch.R;
 import com.lieruce.goforlunch.databinding.FragmentWorkmatesBinding;
 import com.lieruce.goforlunch.model.User;
@@ -78,7 +78,19 @@ public class WorkmatesFragment extends Fragment implements WorkmateAdapter.OnWor
             args.putString("restaurantId", user.getChosenRestaurantId());
             Navigation.findNavController(requireView()).navigate(R.id.restaurantDetailFragment, args);
         } else {
-            Toast.makeText(requireContext(), user.getUsername() + " hasn't decided yet", Toast.LENGTH_SHORT).show();
+            String currentUserId = AuthRepository.getInstance().getCurrentUser() != null
+                    ? AuthRepository.getInstance().getCurrentUser().getUid()
+                    : "";
+            
+            String message;
+            if (user.getUid() != null && user.getUid().equals(currentUserId)) {
+                message = getString(R.string.current_user_status_undecided);
+            } else {
+                String name = user.getUsername() != null ? user.getUsername() : getString(R.string.workmates_image); // Fallback string
+                message = getString(R.string.workmate_status_undecided, name);
+            }
+            
+            Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_SHORT).show();
         }
     }
 

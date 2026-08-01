@@ -350,3 +350,7 @@
     *   **Action (Gradle)**: Set `android.enableJetifier=false` in `gradle.properties`. Modernized the build process by removing the redundant legacy library transformation tool, resulting in faster builds.
     *   **Action (Places SDK)**: Updated `GooglePlacesRepository.java` to resolve deprecation warnings. Migrated from `OPENING_HOURS` to `CURRENT_OPENING_HOURS` as per Google's latest V3 SDK standards.
     *   **Action (Logic)**: Enhanced restaurant mapping to dynamically extract and display opening hours from the new SDK fields.
+*   **Social & Identity Refinements**:
+    *   **Action (UI)**: Added a "Who's joining?" dynamic title to the restaurant detail screen.
+    *   **Action (Grammar)**: Refined identity tagging to use subject pronouns ("I/Je") and correct verb conjugation for the current user across all lists.
+    *   **Action (Feedback)**: Replaced legacy English Toasts with localized, identity-aware Snackbars in the Workmates fragment.

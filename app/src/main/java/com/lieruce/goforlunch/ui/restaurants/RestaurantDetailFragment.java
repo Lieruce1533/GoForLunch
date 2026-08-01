@@ -20,6 +20,7 @@ import com.google.android.material.button.MaterialButton;
 import com.lieruce.goforlunch.R;
 import com.lieruce.goforlunch.databinding.FragmentRestaurantDetailBinding;
 import com.lieruce.goforlunch.model.Restaurant;
+import com.lieruce.goforlunch.repository.AuthRepository;
 import com.lieruce.goforlunch.viewmodel.RestaurantDetailViewModel;
 import com.lieruce.goforlunch.viewmodel.ViewModelFactory;
 
@@ -58,7 +59,10 @@ public class RestaurantDetailFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        workmateAdapter = new WorkmateDetailAdapter();
+        String currentUserId = AuthRepository.getInstance().getCurrentUser() != null 
+                ? AuthRepository.getInstance().getCurrentUser().getUid() 
+                : "";
+        workmateAdapter = new WorkmateDetailAdapter(currentUserId);
         binding.workmatesRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.workmatesRecyclerView.setAdapter(workmateAdapter);
     }
@@ -98,6 +102,11 @@ public class RestaurantDetailFragment extends Fragment {
         viewModel.getWorkmates().observe(getViewLifecycleOwner(), workmates -> {
             if (workmates != null) {
                 workmateAdapter.setWorkmates(workmates);
+                if (workmates.isEmpty()) {
+                    binding.tvWhosJoiningTitle.setVisibility(View.GONE);
+                } else {
+                    binding.tvWhosJoiningTitle.setVisibility(View.VISIBLE);
+                }
             }
         });
     }

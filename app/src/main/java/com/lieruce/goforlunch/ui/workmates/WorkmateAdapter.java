@@ -70,13 +70,8 @@ public class WorkmateAdapter extends RecyclerView.Adapter<WorkmateAdapter.Workma
         }
 
         public void bind(User user, String currentUserId) {
+            boolean isMe = user.getUid() != null && user.getUid().equals(currentUserId);
             String username = user.getUsername() != null ? user.getUsername() : "A coworker";
-            
-            // Add (Me) label if it's the current user
-            if (user.getUid() != null && user.getUid().equals(currentUserId)) {
-                username += " (" + binding.getRoot().getContext().getString(R.string.me) + ")";
-            }
-
             String status;
             
             // Get standard theme colors
@@ -85,11 +80,22 @@ public class WorkmateAdapter extends RecyclerView.Adapter<WorkmateAdapter.Workma
 
             if (user.getChosenRestaurantId() != null && !user.getChosenRestaurantId().isEmpty()) {
                 String restaurantName = user.getChosenRestaurantName() != null ? user.getChosenRestaurantName() : "a restaurant";
-                status = binding.getRoot().getContext().getString(R.string.workmate_status_decided, username, restaurantName);
+                
+                if (isMe) {
+                    status = binding.getRoot().getContext().getString(R.string.current_user_status_decided, restaurantName);
+                } else {
+                    status = binding.getRoot().getContext().getString(R.string.workmate_status_decided, username, restaurantName);
+                }
+                
                 binding.workmateStatus.setTextColor(colorOnSurface);
                 binding.workmateStatus.setTypeface(null, Typeface.BOLD); // ACTIVE = BOLD
             } else {
-                status = binding.getRoot().getContext().getString(R.string.workmate_status_undecided, username);
+                if (isMe) {
+                    status = binding.getRoot().getContext().getString(R.string.current_user_status_undecided);
+                } else {
+                    status = binding.getRoot().getContext().getString(R.string.workmate_status_undecided, username);
+                }
+                
                 binding.workmateStatus.setTextColor(colorOnSurfaceVariant);
                 binding.workmateStatus.setTypeface(null, Typeface.ITALIC); // INACTIVE = ITALIC/GRAY
             }

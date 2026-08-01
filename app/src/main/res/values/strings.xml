@@ -41,10 +41,13 @@
     <string name="test_notification_desc">Triggers a lunch reminder immediately for testing.</string>
     <string name="workmate_status_decided">%1$s is eating at (%2$s)</string>
     <string name="workmate_status_undecided">%1$s hasn\'t decided yet</string>
+    <string name="current_user_status_decided">I am eating at (%1$s)</string>
+    <string name="current_user_status_undecided">I haven\'t decided yet</string>
     <string name="restaurant_open_until">Open until %1$s</string>
     <string name="restaurant_closed_opens">Closed - Opens %1$s</string>
     <string name="restaurant_open_24_7">Open 24/7</string>
     <string name="restaurant_closed">Closed</string>
     <string name="chat">Chat</string>
     <string name="type_a_message">Type a message...</string>
+    <string name="whos_joining">Who\'s joining?</string>
 </resources>
