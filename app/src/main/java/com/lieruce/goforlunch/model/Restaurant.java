@@ -18,6 +18,7 @@ public class Restaurant {
     private final String websiteUrl;
     private final String photoUrl;
     private int workmatesCount;
+    private int stars;
 
     public Restaurant(String id, String name, String address, double rating, List<PhotoMetadata> photoMetadata, double latitude, double longitude, String openingHours, String phoneNumber, String websiteUrl, String photoUrl) {
         this.id = id;
@@ -47,9 +48,14 @@ public class Restaurant {
     public String getWebsiteUrl() { return websiteUrl; }
     public String getPhotoUrl() { return photoUrl; }
     public int getWorkmatesCount() { return workmatesCount; }
+    public int getStars() { return stars; }
 
     // --- SETTERS ---
     public void setWorkmatesCount(int workmatesCount) {
         this.workmatesCount = workmatesCount;
+    }
+
+    public void setStars(int stars) {
+        this.stars = stars;
     }
 }

@@ -258,6 +258,8 @@ public class MainActivity extends AppCompatActivity {
                 navigateToYourLunch();
             } else if (id == R.id.nav_settings) {
                 navController.navigate(R.id.settingsFragment);
+            } else if (id == R.id.chatFragment) {
+                navController.navigate(R.id.chatFragment);
             }
             binding.drawerLayout.closeDrawer(GravityCompat.START);
             return true;

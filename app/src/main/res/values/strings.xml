@@ -45,4 +45,6 @@
     <string name="restaurant_closed_opens">Closed - Opens %1$s</string>
     <string name="restaurant_open_24_7">Open 24/7</string>
     <string name="restaurant_closed">Closed</string>
+    <string name="chat">Chat</string>
+    <string name="type_a_message">Type a message...</string>
 </resources>

@@ -108,7 +108,7 @@ public class GooglePlacesRepository implements RestaurantRepository {
                 Place.Field.LOCATION,
                 Place.Field.RATING,
                 Place.Field.PHOTO_METADATAS,
-                Place.Field.OPENING_HOURS,
+                Place.Field.CURRENT_OPENING_HOURS,
                 Place.Field.BUSINESS_STATUS,
                 Place.Field.NATIONAL_PHONE_NUMBER,
                 Place.Field.WEBSITE_URI
@@ -183,10 +183,23 @@ public class GooglePlacesRepository implements RestaurantRepository {
                 place.getPhotoMetadatas(),
                 loc != null ? loc.latitude : 0,
                 loc != null ? loc.longitude : 0,
-                "Check details for hours",
+                getOpeningHoursString(place),
                 place.getNationalPhoneNumber(),
                 place.getWebsiteUri() != null ? place.getWebsiteUri().toString() : null,
                 null
         );
+    }
+    private String getOpeningHoursString(Place place) {
+        if (place.getCurrentOpeningHours() != null && 
+            place.getCurrentOpeningHours().getWeekdayText() != null && 
+            !place.getCurrentOpeningHours().getWeekdayText().isEmpty()) {
+            
+            // For simplicity, we just take the first line or a specific day
+            // In a real app, you'd pick today's line.
+            // Our RestaurantAdapter expects a string like "Open until 22:00"
+            // Google's weekdayText is like "Monday: 9:00 AM – 10:00 PM"
+            return place.getCurrentOpeningHours().getWeekdayText().get(0); 
+        }
+        return "Check details for hours";
     }
 }

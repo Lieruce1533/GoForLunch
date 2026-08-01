@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.lieruce.goforlunch.repository.AuthRepository;
+import com.lieruce.goforlunch.repository.ChatRepository;
 import com.lieruce.goforlunch.repository.GooglePlacesRepository;
 import com.lieruce.goforlunch.repository.LocationRepository;
 import com.lieruce.goforlunch.repository.MockRestaurantRepository;
@@ -62,6 +63,9 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         }
         if (modelClass.isAssignableFrom(WorkmatesViewModel.class)) {
             return (T) new WorkmatesViewModel(userRepository);
+        }
+        if (modelClass.isAssignableFrom(ChatViewModel.class)) {
+            return (T) new ChatViewModel(ChatRepository.getInstance(), authRepository);
         }
         throw new IllegalArgumentException("Unknown ViewModel class");
     }

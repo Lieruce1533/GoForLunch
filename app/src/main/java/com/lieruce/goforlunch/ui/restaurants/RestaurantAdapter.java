@@ -81,9 +81,8 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Re
             binding.restaurantName.setText(restaurant.getName());
             binding.restaurantAddress.setText(restaurant.getAddress());
             
-            // Normalize Google Rating (0-5) to App Stars (0-3)
-            float normalizedRating = (float) (restaurant.getRating() * 3.0 / 5.0);
-            binding.restaurantRating.setRating(normalizedRating);
+            // Apply Hybrid Star Rating (Social-driven from ViewModel)
+            binding.restaurantRating.setRating(restaurant.getStars());
 
             binding.restaurantHours.setText(formatOpeningHours(restaurant.getOpeningHours()));
 

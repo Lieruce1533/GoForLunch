@@ -4,4 +4,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="colorMarkerGreen">#4CAF50</color>
     <color name="colorMarkerRed">#E53935</color>
+    <color name="chat_background">#F3E5F5</color>
+    <color name="chat_bubble_other">#FFFFFF</color>
+    <color name="chat_text_other">#212121</color>
+    <color name="chat_input_background">#EDE7F6</color>
 </resources>

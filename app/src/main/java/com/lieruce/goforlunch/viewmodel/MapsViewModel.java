@@ -28,8 +28,9 @@ public class MapsViewModel extends ViewModel {
     private final MutableLiveData<String> searchQuery = new MutableLiveData<>("");
     private final MediatorLiveData<List<Restaurant>> filteredRestaurants = new MediatorLiveData<>();
     
-    // Cache for workmate counts to prevent flickering
+    // Cache for social data (counts and likes) to prevent flickering
     private final java.util.Map<String, Integer> restaurantWorkmateCounts = new java.util.HashMap<>();
+    private final java.util.Map<String, Integer> restaurantLikeCounts = new java.util.HashMap<>();
 
     public MapsViewModel(LocationRepository locationRepository, 
                          RestaurantRepository restaurantRepository,
@@ -81,10 +82,10 @@ public class MapsViewModel extends ViewModel {
             }
         });
 
-        // 3. Listen once for ALL user choices to update counts in real-time
+        // 3. Listen once for ALL user choices and likes to update counts in real-time
         userRepository.getAllUsers().addSnapshotListener((value, error) -> {
             if (error == null && value != null) {
-                updateWorkmateCounts(value.toObjects(com.lieruce.goforlunch.model.User.class));
+                updateSocialData(value.toObjects(com.lieruce.goforlunch.model.User.class));
             }
         });
 
@@ -93,15 +94,28 @@ public class MapsViewModel extends ViewModel {
         filteredRestaurants.addSource(searchQuery, query -> applyFilter(nearbyRestaurants.getValue()));
     }
 
-    private void updateWorkmateCounts(List<com.lieruce.goforlunch.model.User> users) {
+    private void updateSocialData(List<com.lieruce.goforlunch.model.User> users) {
         restaurantWorkmateCounts.clear();
+        restaurantLikeCounts.clear();
+        
         for (com.lieruce.goforlunch.model.User user : users) {
+            // Update Workmate Counts (Who is going where today)
             String rid = user.getChosenRestaurantId();
             if (rid != null && !rid.isEmpty()) {
                 int count = restaurantWorkmateCounts.containsKey(rid) ? restaurantWorkmateCounts.get(rid) : 0;
                 restaurantWorkmateCounts.put(rid, count + 1);
             }
+            
+            // Update Like Counts (Who likes what in total)
+            List<String> liked = user.getLikedRestaurants();
+            if (liked != null) {
+                for (String likedId : liked) {
+                    int lCount = restaurantLikeCounts.containsKey(likedId) ? restaurantLikeCounts.get(likedId) : 0;
+                    restaurantLikeCounts.put(likedId, lCount + 1);
+                }
+            }
         }
+        
         // Re-apply enrichment to the current list
         List<Restaurant> current = nearbyRestaurants.getValue();
         if (current != null) {
@@ -112,8 +126,19 @@ public class MapsViewModel extends ViewModel {
 
     private void applyEnrichment(List<Restaurant> restaurants) {
         for (Restaurant r : restaurants) {
-            Integer count = restaurantWorkmateCounts.get(r.getId());
-            r.setWorkmatesCount(count != null ? count : 0);
+            // Apply Workmate counts
+            Integer wCount = restaurantWorkmateCounts.get(r.getId());
+            r.setWorkmatesCount(wCount != null ? wCount : 0);
+            
+            // Apply Hybrid Star Rating (Social-driven)
+            Integer likes = restaurantLikeCounts.get(r.getId());
+            int stars;
+            if (likes == null || likes == 0) stars = 0;
+            else if (likes <= 2) stars = 1;
+            else if (likes <= 5) stars = 2;
+            else stars = 3;
+            
+            r.setStars(stars);
         }
     }
 

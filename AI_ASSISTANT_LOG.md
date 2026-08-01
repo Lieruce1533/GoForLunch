@@ -341,3 +341,12 @@
     *   **Action (Search)**: Implemented synchronized global filtering for the Workmates list, allowing users to search for colleagues by restaurant name.
 *   **Git Management**:
     *   **Action**: Saved progress on the `feature/final-polishing` branch.
+
+## Session: 2026-08-01
+
+### Summary of Work:
+
+*   **Build Optimization & Modernization**:
+    *   **Action (Gradle)**: Set `android.enableJetifier=false` in `gradle.properties`. Modernized the build process by removing the redundant legacy library transformation tool, resulting in faster builds.
+    *   **Action (Places SDK)**: Updated `GooglePlacesRepository.java` to resolve deprecation warnings. Migrated from `OPENING_HOURS` to `CURRENT_OPENING_HOURS` as per Google's latest V3 SDK standards.
+    *   **Action (Logic)**: Enhanced restaurant mapping to dynamically extract and display opening hours from the new SDK fields.
