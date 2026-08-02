@@ -50,4 +50,6 @@
     <string name="chat">Chat</string>
     <string name="type_a_message">Type a message...</string>
     <string name="whos_joining">Who\'s joining?</string>
+    <string name="presentation_mode">Presentation Mode (Mock Data)</string>
+    <string name="presentation_mode_desc">Switch between simulated data and real Google Places API. The app will refresh to apply changes.</string>
 </resources>

@@ -50,4 +50,6 @@
     <string name="chat">Chat</string>
     <string name="type_a_message">Écrivez un message...</string>
     <string name="whos_joining">Qui nous rejoint ?</string>
+    <string name="presentation_mode">Mode Présentation (Données Simulées)</string>
+    <string name="presentation_mode_desc">Basculez entre les données simulées et l\'API Google Places réelle. L\'application sera actualisée.</string>
 </resources>

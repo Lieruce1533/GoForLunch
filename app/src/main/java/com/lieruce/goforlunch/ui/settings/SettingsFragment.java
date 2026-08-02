@@ -1,6 +1,7 @@
 package com.lieruce.goforlunch.ui.settings;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import androidx.core.os.LocaleListCompat;
 import androidx.fragment.app.Fragment;
 
 import com.lieruce.goforlunch.databinding.FragmentSettingsBinding;
+import com.lieruce.goforlunch.viewmodel.ViewModelFactory;
 import com.lieruce.goforlunch.worker.WorkManagerHelper;
 
 public class SettingsFragment extends Fragment {
@@ -21,6 +23,7 @@ public class SettingsFragment extends Fragment {
     private FragmentSettingsBinding binding;
     private static final String PREFS_NAME = "go4lunch_prefs";
     private static final String KEY_NOTIFICATIONS = "enable_notifications";
+    private static final String KEY_PRESENTATION_MODE = "presentation_mode";
 
     @Nullable
     @Override
@@ -48,6 +51,22 @@ public class SettingsFragment extends Fragment {
 
         binding.btnTestNotification.setOnClickListener(v -> {
             WorkManagerHelper.runTestNotification(requireContext());
+        });
+
+        // --- PRESENTATION MODE SWITCH ---
+        boolean isPresentationMode = prefs.getBoolean(KEY_PRESENTATION_MODE, true);
+        binding.switchPresentationMode.setChecked(isPresentationMode);
+
+        binding.switchPresentationMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            prefs.edit().putBoolean(KEY_PRESENTATION_MODE, isChecked).apply();
+            
+            // Reset the factory and perform a FULL restart to clear ViewModels
+            ViewModelFactory.destroyInstance();
+            if (getActivity() != null) {
+                Intent intent = getActivity().getIntent();
+                getActivity().finish();
+                startActivity(intent);
+            }
         });
 
         // --- LANGUAGE SWITCH ---

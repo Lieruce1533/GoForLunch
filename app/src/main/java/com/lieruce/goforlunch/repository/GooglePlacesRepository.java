@@ -1,5 +1,6 @@
 package com.lieruce.goforlunch.repository;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
 import android.util.Log;
@@ -30,7 +31,9 @@ import java.util.Map;
 
 public class GooglePlacesRepository implements RestaurantRepository {
 
+    @SuppressLint("StaticFieldLeak")
     private static volatile GooglePlacesRepository instance;
+    private final Context context;
     private final PlacesClient placesClient;
     private final MutableLiveData<List<Restaurant>> nearbyRestaurantsLiveData = new MutableLiveData<>();
     
@@ -38,6 +41,7 @@ public class GooglePlacesRepository implements RestaurantRepository {
     private final Map<String, Restaurant> restaurantCache = new HashMap<>();
 
     private GooglePlacesRepository(Context context) {
+        this.context = context.getApplicationContext();
         Places.initializeWithNewPlacesApiEnabled(context, BuildConfig.MAPS_API_KEY);
         placesClient = Places.createClient(context);
     }
@@ -76,7 +80,7 @@ public class GooglePlacesRepository implements RestaurantRepository {
         );
 
         SearchNearbyRequest searchRequest = SearchNearbyRequest.builder(locationRestriction, searchFields)
-                .setIncludedTypes(Arrays.asList("restaurant", "cafe"))
+                .setIncludedTypes(Arrays.asList("restaurant", "bakery", "meal_takeaway"))
                 .setMaxResultCount(20)
                 .build();
 
@@ -90,6 +94,8 @@ public class GooglePlacesRepository implements RestaurantRepository {
             nearbyRestaurantsLiveData.setValue(restaurants);
         }).addOnFailureListener(e -> {
             Log.e("GooglePlacesRepository", "Search failed: " + e.getMessage());
+            android.os.Handler handler = new android.os.Handler(android.os.Looper.getMainLooper());
+            handler.post(() -> android.widget.Toast.makeText(context, "Google Places Error: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show());
             nearbyRestaurantsLiveData.setValue(new ArrayList<>());
         });
     }
@@ -194,11 +200,7 @@ public class GooglePlacesRepository implements RestaurantRepository {
             place.getCurrentOpeningHours().getWeekdayText() != null && 
             !place.getCurrentOpeningHours().getWeekdayText().isEmpty()) {
             
-            // For simplicity, we just take the first line or a specific day
-            // In a real app, you'd pick today's line.
-            // Our RestaurantAdapter expects a string like "Open until 22:00"
-            // Google's weekdayText is like "Monday: 9:00 AM – 10:00 PM"
-            return place.getCurrentOpeningHours().getWeekdayText().get(0); 
+            return place.getCurrentOpeningHours().getWeekdayText().get(0);
         }
         return "Check details for hours";
     }

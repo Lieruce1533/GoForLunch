@@ -43,6 +43,20 @@
         android:layout_marginTop="4dp"
         android:textStyle="italic"/>
 
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/switch_presentation_mode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/presentation_mode" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/presentation_mode_desc"
+        android:textSize="12sp"
+        android:layout_marginTop="4dp"/>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -1,6 +1,7 @@
 package com.lieruce.goforlunch.viewmodel;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
@@ -22,9 +23,6 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     private final LocationRepository locationRepository;
     private final RestaurantRepository restaurantRepository;
 
-    // --- TOGGLE THIS TO SWITCH BETWEEN MOCK AND REAL GOOGLE ---
-    private static final boolean USE_MOCK = true;
-
     public static ViewModelFactory getInstance(Context context) {
         if (instance == null) {
             synchronized (ViewModelFactory.class) {
@@ -36,12 +34,19 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         return instance;
     }
 
+    public static void destroyInstance() {
+        instance = null;
+    }
+
     private ViewModelFactory(Context context) {
         this.authRepository = AuthRepository.getInstance();
         this.userRepository = UserRepository.getInstance();
         this.locationRepository = LocationRepository.getInstance(context);
         
-        if (USE_MOCK) {
+        SharedPreferences prefs = context.getSharedPreferences("go4lunch_prefs", Context.MODE_PRIVATE);
+        boolean useMock = prefs.getBoolean("presentation_mode", true);
+        
+        if (useMock) {
             this.restaurantRepository = new MockRestaurantRepository();
         } else {
             this.restaurantRepository = GooglePlacesRepository.getInstance(context);
