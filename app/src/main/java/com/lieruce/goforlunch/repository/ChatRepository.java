@@ -6,6 +6,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.lieruce.goforlunch.model.Message;
 
+/**
+ * Repository for persistent real-time chat data.
+ * Manages the "chat_messages" Firestore collection and provides sorted message queries.
+ */
 public class ChatRepository {
 
     private static final String COLLECTION_NAME = "chat_messages";

@@ -18,6 +18,10 @@ import com.lieruce.goforlunch.databinding.FragmentSettingsBinding;
 import com.lieruce.goforlunch.viewmodel.ViewModelFactory;
 import com.lieruce.goforlunch.worker.WorkManagerHelper;
 
+/**
+ * Fragment providing user-configurable settings.
+ * Handles notification scheduling, language switching (runtime locale change), and the Presentation Mode toggle.
+ */
 public class SettingsFragment extends Fragment {
 
     private FragmentSettingsBinding binding;

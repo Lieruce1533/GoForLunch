@@ -11,6 +11,10 @@ import androidx.work.WorkManager;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Utility class for managing WorkManager tasks.
+ * Handles the calculation of initial delays to ensure notifications trigger exactly at 12:00 PM.
+ */
 public class WorkManagerHelper {
 
     private static final String WORK_NAME = "lunch_reminder_work";

@@ -2,6 +2,10 @@ package com.lieruce.goforlunch.model;
 
 import java.util.List;
 
+/**
+ * Data Model representing a User in the application and Firestore.
+ * Contains profile information and social choice metadata.
+ */
 public class User {
 
     private String uid;

@@ -21,6 +21,10 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Adapter for the main restaurant list.
+ * Handles distance calculations and translates raw API hours into localized user-friendly strings.
+ */
 public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.RestaurantViewHolder> {
 
     public interface OnRestaurantClickListener {
@@ -183,9 +187,10 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Re
             Restaurant newItem = newList.get(newItemPosition);
             return Objects.equals(oldItem.getName(), newItem.getName()) &&
                     Objects.equals(oldItem.getAddress(), newItem.getAddress()) &&
-                    oldItem.getRating() == newItem.getRating() &&
+                    Double.compare(oldItem.getRating(), newItem.getRating()) == 0 &&
                     Objects.equals(oldItem.getOpeningHours(), newItem.getOpeningHours()) &&
                     oldItem.getWorkmatesCount() == newItem.getWorkmatesCount() &&
+                    oldItem.getStars() == newItem.getStars() &&
                     Objects.equals(oldItem.getPhotoUrl(), newItem.getPhotoUrl());
         }
     }

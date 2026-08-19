@@ -20,6 +20,10 @@ import com.lieruce.goforlunch.repository.AuthRepository;
 import com.lieruce.goforlunch.viewmodel.ViewModelFactory;
 import com.lieruce.goforlunch.viewmodel.WorkmatesViewModel;
 
+/**
+ * Fragment displaying the global list of coworkers and their current lunch choices.
+ * Supports reactive searching and direct navigation to coworkers' chosen restaurants.
+ */
 public class WorkmatesFragment extends Fragment implements WorkmateAdapter.OnWorkmateClickListener {
 
     private FragmentWorkmatesBinding binding;

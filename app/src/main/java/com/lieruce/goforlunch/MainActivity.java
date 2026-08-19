@@ -46,6 +46,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * The single host Activity for the entire application (Single-Activity Architecture).
+ * Manages the high-level navigation (Bottom Nav, Drawer), search routing, and global permission flows.
+ */
 public class MainActivity extends AppCompatActivity {
 
     private MainViewModel mainViewModel;
@@ -55,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private NavController navController;
     private AppBarConfiguration appBarConfiguration;
     private MenuProvider currentMenuProvider;
+    private boolean isSignInFlowStarted = false;
 
     private final ActivityResultLauncher<Intent> signInLauncher =
             registerForActivityResult(new FirebaseAuthUIActivityResultContract(), this::onSignInResult);
@@ -253,7 +258,23 @@ public class MainActivity extends AppCompatActivity {
         binding.navView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_logout) {
-                mainViewModel.signOut(this).addOnSuccessListener(aVoid -> mainViewModel.refreshUser());
+                mainViewModel.signOut(this).addOnSuccessListener(aVoid -> {
+                    // Force-reset the ViewModelFactory singleton
+                    ViewModelFactory.destroyInstance();
+                    
+                    com.google.firebase.firestore.FirebaseFirestore db = com.google.firebase.firestore.FirebaseFirestore.getInstance();
+                    db.terminate().addOnCompleteListener(task -> {
+                        db.clearPersistence().addOnCompleteListener(task2 -> {
+                            // Robust Full App Restart via PackageManager
+                            Intent launchIntent = getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
+                            if (launchIntent != null) {
+                                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(launchIntent);
+                            }
+                            System.exit(0); // Force-kill the process to ensure a clean Firestore re-init
+                        });
+                    });
+                });
             } else if (id == R.id.nav_your_lunch) {
                 navigateToYourLunch();
             } else if (id == R.id.nav_settings) {
@@ -319,6 +340,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void launchSignInFlow() {
+        if (isSignInFlowStarted) return;
+        isSignInFlowStarted = true;
+
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build(),
                 new AuthUI.IdpConfig.GoogleBuilder().build());
@@ -330,13 +354,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
+        isSignInFlowStarted = false;
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
             mainViewModel.refreshUser();
         } else {
-            if (response == null) {
-                showSnackBar("Sign in cancelled");
-            } else if (response.getError() != null) {
+            // Only show snackbar if it's an actual error, not a clean cancellation
+            if (response != null && response.getError() != null) {
                 showSnackBar("Sign in failed: " + response.getError().getErrorCode());
             }
         }

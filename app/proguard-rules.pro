@@ -19,3 +19,10 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# --- GO4LUNCH CUSTOM RULES ---
+
+# Keep data models used for Firestore and API serialization.
+# Renaming these classes or their fields would break the mapping
+# between the database/API JSON and the Java objects.
+-keep class com.lieruce.goforlunch.model.** { *; }

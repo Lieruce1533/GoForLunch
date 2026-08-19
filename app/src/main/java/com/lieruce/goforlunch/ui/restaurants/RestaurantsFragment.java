@@ -68,7 +68,7 @@ public class RestaurantsFragment extends Fragment implements RestaurantAdapter.O
             }
         });
 
-        // Observe restaurant list
+            // Observe restaurant list
         mapsViewModel.getNearbyRestaurants().observe(getViewLifecycleOwner(), restaurants -> {
             binding.loadingIndicator.setVisibility(View.GONE);
             binding.swipeRefreshLayout.setRefreshing(false);

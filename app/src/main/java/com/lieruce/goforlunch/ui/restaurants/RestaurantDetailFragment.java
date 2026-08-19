@@ -24,6 +24,10 @@ import com.lieruce.goforlunch.repository.AuthRepository;
 import com.lieruce.goforlunch.viewmodel.RestaurantDetailViewModel;
 import com.lieruce.goforlunch.viewmodel.ViewModelFactory;
 
+/**
+ * Fragment displaying comprehensive details for a specific restaurant.
+ * Features participant lists, interaction buttons (Call, Like, Website), and selection management.
+ */
 public class RestaurantDetailFragment extends Fragment {
 
     private FragmentRestaurantDetailBinding binding;
@@ -109,6 +113,13 @@ public class RestaurantDetailFragment extends Fragment {
                 }
             }
         });
+
+        // Observe social stars (The Rating)
+        viewModel.getSocialStars().observe(getViewLifecycleOwner(), stars -> {
+            if (stars != null) {
+                binding.detailRestaurantRating.setRating(stars);
+            }
+        });
     }
 
     private void updateUI(Restaurant restaurant) {
@@ -116,9 +127,7 @@ public class RestaurantDetailFragment extends Fragment {
         binding.detailRestaurantAddress.setText(restaurant.getAddress());
         binding.detailRestaurantHours.setText(restaurant.getOpeningHours());
         
-        // Normalize Google Rating (0-5) to App Stars (0-3)
-        float normalizedRating = (float) (restaurant.getRating() * 3.0 / 5.0);
-        binding.detailRestaurantRating.setRating(normalizedRating);
+        // Google rating is no longer used here; we rely on the social stars observer above
 
         // Photo loading
         Glide.with(this)

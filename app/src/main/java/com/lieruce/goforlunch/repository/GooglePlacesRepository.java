@@ -29,6 +29,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Real-world implementation of RestaurantRepository using the Google Places SDK.
+ * Implements tiered data fetching and resolved photo management to optimize API quotas.
+ */
 public class GooglePlacesRepository implements RestaurantRepository {
 
     @SuppressLint("StaticFieldLeak")
@@ -62,6 +66,10 @@ public class GooglePlacesRepository implements RestaurantRepository {
         return nearbyRestaurantsLiveData;
     }
 
+    /**
+     * Searches for nearby food establishments.
+     * Restricts results to relevant types (restaurant, bakery, meal_takeaway) to ensure data quality.
+     */
     @Override
     public void fetchNearbyRestaurants(Location location) {
         if (location == null) return;

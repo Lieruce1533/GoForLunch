@@ -40,6 +40,7 @@ public class RestaurantDetailViewModelTest {
         // Mock Firestore Query returned by getUsersEatingAt
         Query mockQuery = mock(Query.class);
         when(userRepository.getUsersEatingAt(anyString())).thenReturn(mockQuery);
+        when(userRepository.getLikesForRestaurant(anyString())).thenReturn(mockQuery);
 
         viewModel = new RestaurantDetailViewModel(restaurantRepository, userRepository, authRepository);
     }
@@ -58,5 +59,6 @@ public class RestaurantDetailViewModelTest {
         // Assert
         verify(restaurantRepository).getRestaurantDetails(rid);
         verify(userRepository).getUsersEatingAt(rid);
+        verify(userRepository).getLikesForRestaurant(rid);
     }
 }

@@ -14,6 +14,10 @@ import com.lieruce.goforlunch.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ViewModel for the Restaurant Detail screen.
+ * Aggregates on-demand place details with user-specific states (isLiked, isSelected).
+ */
 public class RestaurantDetailViewModel extends ViewModel {
 
     private final RestaurantRepository restaurantRepository;
@@ -24,6 +28,7 @@ public class RestaurantDetailViewModel extends ViewModel {
     private final MutableLiveData<List<User>> workmatesLiveData = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isRestaurantSelected = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isRestaurantLiked = new MutableLiveData<>();
+    private final MutableLiveData<Integer> socialStars = new MutableLiveData<>(0);
 
     public RestaurantDetailViewModel(RestaurantRepository restaurantRepository, 
                                    UserRepository userRepository,
@@ -59,6 +64,19 @@ public class RestaurantDetailViewModel extends ViewModel {
         userRepository.getUsersEatingAt(restaurantId).addSnapshotListener((value, error) -> {
             if (error == null && value != null) {
                 workmatesLiveData.setValue(value.toObjects(User.class));
+            }
+        });
+
+        // 4. Listen for total likes to calculate social stars (0-3)
+        userRepository.getLikesForRestaurant(restaurantId).addSnapshotListener((value, error) -> {
+            if (error == null && value != null) {
+                int likes = value.size();
+                int stars;
+                if (likes == 0) stars = 0;
+                else if (likes <= 2) stars = 1;
+                else if (likes <= 5) stars = 2;
+                else stars = 3;
+                socialStars.setValue(stars);
             }
         });
     }
@@ -100,4 +118,5 @@ public class RestaurantDetailViewModel extends ViewModel {
     public LiveData<List<User>> getWorkmates() { return workmatesLiveData; }
     public LiveData<Boolean> getIsRestaurantSelected() { return isRestaurantSelected; }
     public LiveData<Boolean> getIsRestaurantLiked() { return isRestaurantLiked; }
+    public LiveData<Integer> getSocialStars() { return socialStars; }
 }

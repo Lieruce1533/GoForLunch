@@ -3,6 +3,10 @@ package com.lieruce.goforlunch.model;
 import com.google.firebase.firestore.ServerTimestamp;
 import java.util.Date;
 
+/**
+ * Data Model for a single chat message.
+ * Utilizes Firebase ServerTimestamp for reliable cross-client chronological sorting.
+ */
 public class Message {
     private String id;
     private String senderId;

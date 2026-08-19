@@ -11,6 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Simulated implementation of RestaurantRepository for presentation and testing purposes.
+ * Provides a fixed set of high-quality restaurant data centered around the Louvre, Paris.
+ */
 public class MockRestaurantRepository implements RestaurantRepository {
 
     private final MutableLiveData<List<Restaurant>> nearbyRestaurantsLiveData = new MutableLiveData<>();

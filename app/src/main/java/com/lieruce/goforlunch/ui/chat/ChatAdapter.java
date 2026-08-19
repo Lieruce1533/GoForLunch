@@ -19,6 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Adapter for the real-time chat message list.
+ * Implements modern messaging UI patterns with left/right alignment based on the message sender.
+ */
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder> {
 
     private final String currentUserId;

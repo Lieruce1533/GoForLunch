@@ -15,6 +15,10 @@ import com.lieruce.goforlunch.model.User;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Repository responsible for all User-related Firestore operations.
+ * Acts as the Data Source of Truth for profile management, lunch selections, and social engagement.
+ */
 public class UserRepository {
 
     private static final String COLLECTION_NAME = "users";
@@ -38,6 +42,12 @@ public class UserRepository {
     }
 
     // --- CREATE ---
+    /**
+     * Persists or updates user profile data in Firestore upon successful authentication.
+     * Uses SetOptions.merge() to protect existing data (like lunch choices) from being overwritten.
+     * @param firebaseUser The authenticated user from Firebase Auth.
+     * @return A Task representing the completion of the Firestore operation.
+     */
     public Task<Void> createUser(FirebaseUser firebaseUser) {
         if (firebaseUser == null) return null;
 
@@ -71,6 +81,13 @@ public class UserRepository {
         return usersCollection.whereEqualTo("chosenRestaurantId", restaurantId);
     }
 
+    /**
+     * Returns a query for all users who have liked a specific restaurant.
+     */
+    public Query getLikesForRestaurant(String restaurantId) {
+        return usersCollection.whereArrayContains("likedRestaurants", restaurantId);
+    }
+
     public Query getAllUsers() {
         return usersCollection;
     }
@@ -78,6 +95,10 @@ public class UserRepository {
     // --- UPDATE ---
     
     // Updates the restaurant the user has chosen for today
+    /**
+     * Updates the user's lunch choice for the current day.
+     * Stores the restaurant metadata directly in the user document for efficient list rendering.
+     */
     public Task<Void> updateChosenRestaurant(String uid, String restaurantId, String restaurantName, String restaurantAddress) {
         Map<String, Object> updates = new HashMap<>();
         updates.put("chosenRestaurantId", restaurantId);
@@ -88,6 +109,10 @@ public class UserRepository {
     }
 
     // Toggle liking a restaurant
+    /**
+     * Toggles a restaurant in the user's "Liked" list.
+     * Uses Firestore FieldValue operators for atomic array updates.
+     */
     public Task<Void> updateLikedRestaurant(String uid, String restaurantId, boolean isLiked) {
         Map<String, Object> updates = new HashMap<>();
         if (isLiked) {

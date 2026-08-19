@@ -23,6 +23,10 @@ import com.lieruce.goforlunch.repository.UserRepository;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * Background worker responsible for generating the daily 12:00 PM lunch reminder.
+ * Aggregates social data from Firestore and local user preferences to provide a detailed notification.
+ */
 public class NotificationWorker extends Worker {
 
     private static final String CHANNEL_ID = "lunch_notifications";

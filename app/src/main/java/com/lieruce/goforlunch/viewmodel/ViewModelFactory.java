@@ -15,6 +15,10 @@ import com.lieruce.goforlunch.repository.MockRestaurantRepository;
 import com.lieruce.goforlunch.repository.RestaurantRepository;
 import com.lieruce.goforlunch.repository.UserRepository;
 
+/**
+ * Centralized Factory for ViewModel creation (Manual Dependency Injection).
+ * Manages the instantiation of repositories and swaps data sources based on the active mode (Presentation vs Real).
+ */
 public class ViewModelFactory implements ViewModelProvider.Factory {
 
     private static volatile ViewModelFactory instance;
@@ -61,13 +65,13 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
             return (T) new MainViewModel(authRepository, userRepository);
         }
         if (modelClass.isAssignableFrom(MapsViewModel.class)) {
-            return (T) new MapsViewModel(locationRepository, restaurantRepository, userRepository);
+            return (T) new MapsViewModel(locationRepository, restaurantRepository, userRepository, authRepository);
         }
         if (modelClass.isAssignableFrom(RestaurantDetailViewModel.class)) {
             return (T) new RestaurantDetailViewModel(restaurantRepository, userRepository, authRepository);
         }
         if (modelClass.isAssignableFrom(WorkmatesViewModel.class)) {
-            return (T) new WorkmatesViewModel(userRepository);
+            return (T) new WorkmatesViewModel(userRepository, authRepository);
         }
         if (modelClass.isAssignableFrom(ChatViewModel.class)) {
             return (T) new ChatViewModel(ChatRepository.getInstance(), authRepository);

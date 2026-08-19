@@ -15,6 +15,10 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 
+/**
+ * Singleton repository managing GPS location services.
+ * Wraps the FusedLocationProviderClient and exposes device coordinates via LiveData.
+ */
 public class LocationRepository {
 
     private static volatile LocationRepository instance;

@@ -4,6 +4,10 @@ import com.google.android.libraries.places.api.model.PhotoMetadata;
 
 import java.util.List;
 
+/**
+ * Data Model representing a Restaurant establishment.
+ * Consolidates static data from Google Places with dynamic social data (attendance, stars) from Firestore.
+ */
 public class Restaurant {
 
     private final String id;

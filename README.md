@@ -49,12 +49,34 @@ The application follows **Clean Architecture** principles and Google's **Modern 
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Getting Started & Configuration
 
-1. **Clone the Repo**: `git clone https://github.com/Lieruce1533/GoForLunch.git`
-2. **API Keys**: Add your `MAPS_API_KEY` to the `local.properties` file.
-3. **Firebase**: Add your `google-services.json` to the `app/` directory.
-4. **Build**: Open in Android Studio and run the `app` module.
+Follow these steps to set up the project on your local machine:
+
+### 1. Basic Setup
+- **Clone the Repo**: `git clone https://github.com/Lieruce1533/GoForLunch.git`
+- **Open in Android Studio**: Ensure you are using the latest stable version of Android Studio.
+
+### 2. Google Maps & Places Setup
+The app requires a valid API key from the **Google Cloud Console**.
+1. **Enable APIs**: In your Google Cloud project, enable the following:
+    - `Maps SDK for Android`
+    - `Places API (New)`
+2. **Generate Key**: Create an API Key under **Credentials**.
+3. **Local Configuration**: Create or open the `local.properties` file in the project root and add your key:
+   ```properties
+   MAPS_API_KEY=your_api_key_here
+   ```
+
+### 3. Firebase Configuration
+The app uses Firebase for authentication and real-time data storage.
+1. **Create Firebase Project**: Go to the [Firebase Console](https://console.firebase.google.com/).
+2. **Register App**: Add an Android app with the package name `com.lieruce.goforlunch`.
+3. **Add Config File**: Download the `google-services.json` and place it in the `app/` directory.
+4. **Authentication**: Enable the following providers:
+    - `Email/Password`
+    - `Google` (Requires adding your debug/release SHA-1 fingerprint to the Firebase settings).
+5. **Firestore**: Enable Cloud Firestore in "Production Mode" and set the security rules to allow authenticated reads/writes (see `database_schema.md` for details).
 
 ---
 

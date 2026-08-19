@@ -1,0 +1,986 @@
+@startuml
+class com.lieruce.goforlunch.databinding.FragmentWorkmatesBinding {
+- ConstraintLayout rootView
++ TextView workmatesEmptyView
++ RecyclerView workmatesRecyclerView
++ ConstraintLayout getRoot()
++ {static} FragmentWorkmatesBinding inflate(LayoutInflater)
++ {static} FragmentWorkmatesBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} FragmentWorkmatesBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.databinding.ActivityMainBinding {
+- DrawerLayout rootView
++ BottomNavigationView bottomNavigation
++ DrawerLayout drawerLayout
++ FragmentContainerView navHostFragment
++ NavigationView navView
++ MaterialToolbar toolbar
++ DrawerLayout getRoot()
++ {static} ActivityMainBinding inflate(LayoutInflater)
++ {static} ActivityMainBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} ActivityMainBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.viewmodel.MapsViewModelTest {
++ InstantTaskExecutorRule instantTaskExecutorRule
+- MapsViewModel mapsViewModel
+- LocationRepository locationRepository
+- RestaurantRepository restaurantRepository
+- UserRepository userRepository
+- MutableLiveData<Location> locationLiveData
+- MutableLiveData<List<Restaurant>> restaurantsLiveData
+- MockedStatic<Log> mockedLog
+- MockedStatic<Location> mockedLocation
++ void setUp()
++ void tearDown()
++ void locationUpdate_shouldTriggerRestaurantFetch()
++ void searchFilter_shouldReturnOnlyMatchingRestaurants()
+}
+
+
+class com.lieruce.goforlunch.ui.settings.SettingsFragment {
+- FragmentSettingsBinding binding
+- {static} String PREFS_NAME
+- {static} String KEY_NOTIFICATIONS
+- {static} String KEY_PRESENTATION_MODE
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
++ void onViewCreated(View,Bundle)
++ void onDestroyView()
+}
+
+
+class com.lieruce.goforlunch.databinding.FragmentRestaurantsBinding {
+- ConstraintLayout rootView
++ TextView emptyView
++ ProgressBar loadingIndicator
++ RecyclerView restaurantRecyclerView
++ SwipeRefreshLayout swipeRefreshLayout
++ ConstraintLayout getRoot()
++ {static} FragmentRestaurantsBinding inflate(LayoutInflater)
++ {static} FragmentRestaurantsBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} FragmentRestaurantsBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.repository.AuthRepositoryTest {
+- AuthRepository authRepository
+- MockedStatic<FirebaseAuth> mockedFirebaseAuth
+- FirebaseAuth mockAuth
++ void setUp()
++ void tearDown()
++ void getCurrentUser_shouldReturnFirebaseUser()
+}
+
+
+interface com.lieruce.goforlunch.repository.RestaurantRepository {
+~ LiveData<List<Restaurant>> getNearbyRestaurantsLiveData()
+~ void fetchNearbyRestaurants(Location)
+~ Task<Restaurant> getRestaurantDetails(String)
+}
+
+class com.lieruce.goforlunch.databinding.ItemRestaurantBinding {
+- CardView rootView
++ ImageView iconWorkmates
++ TextView restaurantAddress
++ TextView restaurantDistance
++ TextView restaurantHours
++ TextView restaurantName
++ ImageView restaurantPhoto
++ RatingBar restaurantRating
++ TextView workmatesCount
++ CardView getRoot()
++ {static} ItemRestaurantBinding inflate(LayoutInflater)
++ {static} ItemRestaurantBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} ItemRestaurantBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.databinding.FragmentSettingsBinding {
+- LinearLayout rootView
++ MaterialButton btnTestNotification
++ MaterialSwitch switchLanguage
++ MaterialSwitch switchNotifications
++ MaterialSwitch switchPresentationMode
++ LinearLayout getRoot()
++ {static} FragmentSettingsBinding inflate(LayoutInflater)
++ {static} FragmentSettingsBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} FragmentSettingsBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.viewmodel.RestaurantDetailViewModel {
+- RestaurantRepository restaurantRepository
+- UserRepository userRepository
+- AuthRepository authRepository
+- MutableLiveData<Restaurant> restaurantLiveData
+- MutableLiveData<List<User>> workmatesLiveData
+- MutableLiveData<Boolean> isRestaurantSelected
+- MutableLiveData<Boolean> isRestaurantLiked
++ void setRestaurantId(String)
++ void toggleSelection()
++ void toggleLike()
++ LiveData<Restaurant> getRestaurant()
++ LiveData<List<User>> getWorkmates()
++ LiveData<Boolean> getIsRestaurantSelected()
++ LiveData<Boolean> getIsRestaurantLiked()
+}
+
+
+class com.lieruce.goforlunch.viewmodel.ChatViewModel {
+- ChatRepository chatRepository
+- AuthRepository authRepository
+- MutableLiveData<List<Message>> messagesLiveData
+- void listenToMessages()
++ void sendMessage(String)
++ LiveData<List<Message>> getMessages()
+}
+
+
+class com.lieruce.goforlunch.ui.map.MapFragment {
+- FragmentMapBinding binding
+- MapsViewModel viewModel
+- GoogleMap googleMap
+- boolean isInitialLocationSet
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
++ void onViewCreated(View,Bundle)
+- void setupMap()
+- void setupManualLocationListeners()
+- void updateMapMarkers(List<Restaurant>)
+- void navigateToDetail(String)
+- BitmapDescriptor getBitmapDescriptorFromVector(int)
+- int darkenColor(int,float)
++ void onDestroyView()
+}
+
+
+class com.lieruce.goforlunch.MainActivityTest {
++ ActivityScenarioRule<MainActivity> activityRule
+- void waitForView(int,long)
+- void waitForViewToBeGone(Matcher<View>,long)
+- {static} ViewAction forceClick()
++ void bottomNavigation_shouldSwitchFragments()
++ void navigationDrawer_shouldOpen()
+}
+
+
+class com.lieruce.goforlunch.databinding.FragmentMapBinding {
+- ConstraintLayout rootView
++ Button btnSearchArea
++ FloatingActionButton fabMyLocation
++ FragmentContainerView map
++ ConstraintLayout getRoot()
++ {static} FragmentMapBinding inflate(LayoutInflater)
++ {static} FragmentMapBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} FragmentMapBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.ui.chat.ChatAdapter {
+- String currentUserId
+- List<Message> messages
++ void setMessages(List<Message>)
++ ChatViewHolder onCreateViewHolder(ViewGroup,int)
++ void onBindViewHolder(ChatViewHolder,int)
++ int getItemCount()
+}
+
+
+class com.lieruce.goforlunch.ui.chat.ChatAdapter$ChatViewHolder {
+- ItemChatMessageBinding binding
++ void bind(Message,String)
+}
+
+
+class com.lieruce.goforlunch.ui.chat.ChatAdapter$ChatDiffCallback {
+- List<Message> oldList
+- List<Message> newList
++ int getOldListSize()
++ int getNewListSize()
++ boolean areItemsTheSame(int,int)
++ boolean areContentsTheSame(int,int)
+}
+
+
+class com.lieruce.goforlunch.test.BuildConfig {
++ {static} boolean DEBUG
++ {static} String APPLICATION_ID
++ {static} String BUILD_TYPE
++ {static} String MAPS_API_KEY
+}
+
+class com.lieruce.goforlunch.ui.workmates.WorkmatesFragment {
+- FragmentWorkmatesBinding binding
+- WorkmatesViewModel viewModel
+- WorkmateAdapter adapter
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
++ void onViewCreated(View,Bundle)
+- void setupViewModel()
+- void setupRecyclerView()
+- void observeWorkmates()
++ void onWorkmateClick(User)
++ void onDestroyView()
+}
+
+
+class com.lieruce.goforlunch.databinding.FragmentSettingsBinding {
+- LinearLayout rootView
++ MaterialButton btnTestNotification
++ MaterialSwitch switchLanguage
++ MaterialSwitch switchNotifications
++ MaterialSwitch switchPresentationMode
++ LinearLayout getRoot()
++ {static} FragmentSettingsBinding inflate(LayoutInflater)
++ {static} FragmentSettingsBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} FragmentSettingsBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.model.User {
+- String uid
+- String username
+- String avatarUrl
+- String chosenRestaurantId
+- String chosenRestaurantName
+- String chosenRestaurantAddress
+- List<String> likedRestaurants
++ String getUid()
++ String getUsername()
++ String getAvatarUrl()
++ String getChosenRestaurantId()
++ String getChosenRestaurantName()
++ String getChosenRestaurantAddress()
++ List<String> getLikedRestaurants()
++ void setUid(String)
++ void setUsername(String)
++ void setAvatarUrl(String)
++ void setChosenRestaurantId(String)
++ void setChosenRestaurantName(String)
++ void setChosenRestaurantAddress(String)
++ void setLikedRestaurants(List<String>)
+}
+
+
+class com.lieruce.goforlunch.ui.workmates.WorkmateAdapter {
+- OnWorkmateClickListener listener
+- String currentUserId
+- List<User> workmates
++ void setWorkmates(List<User>)
++ WorkmateViewHolder onCreateViewHolder(ViewGroup,int)
++ void onBindViewHolder(WorkmateViewHolder,int)
++ int getItemCount()
+}
+
+
+interface com.lieruce.goforlunch.ui.workmates.WorkmateAdapter$OnWorkmateClickListener {
+~ void onWorkmateClick(User)
+}
+
+class com.lieruce.goforlunch.ui.workmates.WorkmateAdapter$WorkmateViewHolder {
+- ItemWorkmateBinding binding
++ void bind(User,String)
+}
+
+
+class com.lieruce.goforlunch.ui.workmates.WorkmateAdapter$WorkmateDiffCallback {
+- List<User> oldList
+- List<User> newList
++ int getOldListSize()
++ int getNewListSize()
++ boolean areItemsTheSame(int,int)
++ boolean areContentsTheSame(int,int)
+}
+
+
+class com.lieruce.goforlunch.repository.MockRestaurantRepository {
+- MutableLiveData<List<Restaurant>> nearbyRestaurantsLiveData
+- Map<String,Restaurant> mockRestaurants
+- void initMockData()
+- void addMock(String,String,String,double,double,double,String,String,String,String)
++ LiveData<List<Restaurant>> getNearbyRestaurantsLiveData()
++ void fetchNearbyRestaurants(Location)
++ Task<Restaurant> getRestaurantDetails(String)
+}
+
+
+class com.lieruce.goforlunch.repository.AuthRepository {
+- FirebaseAuth firebaseAuth
+- {static} AuthRepository instance
++ {static} AuthRepository getInstance()
++ FirebaseUser getCurrentUser()
++ Task<Void> signOut(Context)
+}
+
+
+class com.lieruce.goforlunch.BuildConfig {
++ {static} boolean DEBUG
++ {static} String APPLICATION_ID
++ {static} String BUILD_TYPE
++ {static} int VERSION_CODE
++ {static} String VERSION_NAME
++ {static} String MAPS_API_KEY
+}
+
+class com.lieruce.goforlunch.databinding.FragmentRestaurantDetailBinding {
+- ConstraintLayout rootView
++ LinearLayout actionsContainer
++ Button btnCall
++ Button btnLike
++ Button btnWebsite
++ TextView detailRestaurantAddress
++ TextView detailRestaurantHours
++ TextView detailRestaurantName
++ ImageView detailRestaurantPhoto
++ RatingBar detailRestaurantRating
++ ExtendedFloatingActionButton detailSelectFab
++ View infoContainer
++ TextView tvWhosJoiningTitle
++ RecyclerView workmatesRecyclerView
++ ConstraintLayout getRoot()
++ {static} FragmentRestaurantDetailBinding inflate(LayoutInflater)
++ {static} FragmentRestaurantDetailBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} FragmentRestaurantDetailBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.viewmodel.ViewModelFactory {
+- {static} ViewModelFactory instance
+- AuthRepository authRepository
+- UserRepository userRepository
+- LocationRepository locationRepository
+- RestaurantRepository restaurantRepository
++ {static} ViewModelFactory getInstance(Context)
++ {static} void destroyInstance()
++ T create(Class<T>)
+}
+
+
+class com.lieruce.goforlunch.databinding.FragmentWorkmatesBinding {
+- ConstraintLayout rootView
++ TextView workmatesEmptyView
++ RecyclerView workmatesRecyclerView
++ ConstraintLayout getRoot()
++ {static} FragmentWorkmatesBinding inflate(LayoutInflater)
++ {static} FragmentWorkmatesBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} FragmentWorkmatesBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.repository.GooglePlacesRepository {
+- {static} GooglePlacesRepository instance
+- Context context
+- PlacesClient placesClient
+- MutableLiveData<List<Restaurant>> nearbyRestaurantsLiveData
+- Map<String,Restaurant> restaurantCache
++ {static} GooglePlacesRepository getInstance(Context)
++ LiveData<List<Restaurant>> getNearbyRestaurantsLiveData()
++ void fetchNearbyRestaurants(Location)
++ Task<Restaurant> getRestaurantDetails(String)
+- Task<Restaurant> resolvePhotoAndCache(Restaurant,PhotoMetadata)
+- Restaurant mapPlaceToRestaurant(Place)
+- String getOpeningHoursString(Place)
+}
+
+
+class com.lieruce.goforlunch.databinding.FragmentMapBinding {
+- ConstraintLayout rootView
++ Button btnSearchArea
++ FloatingActionButton fabMyLocation
++ FragmentContainerView map
++ ConstraintLayout getRoot()
++ {static} FragmentMapBinding inflate(LayoutInflater)
++ {static} FragmentMapBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} FragmentMapBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.ui.restaurants.RestaurantDetailFragment {
+- FragmentRestaurantDetailBinding binding
+- RestaurantDetailViewModel viewModel
+- WorkmateDetailAdapter workmateAdapter
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
++ void onViewCreated(View,Bundle)
+- void setupViewModel()
+- void setupRecyclerView()
+- void observeData()
+- void updateUI(Restaurant)
+- void setupClickListeners()
++ void onDestroyView()
+}
+
+
+class com.lieruce.goforlunch.databinding.ItemChatMessageBinding {
+- ConstraintLayout rootView
++ ShapeableImageView messageAvatar
++ MaterialCardView messageBubble
++ TextView messageSenderName
++ TextView messageText
++ ConstraintLayout getRoot()
++ {static} ItemChatMessageBinding inflate(LayoutInflater)
++ {static} ItemChatMessageBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} ItemChatMessageBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.databinding.ItemWorkmateDetailBinding {
+- ConstraintLayout rootView
++ ShapeableImageView workmateAvatar
++ TextView workmateName
++ ConstraintLayout getRoot()
++ {static} ItemWorkmateDetailBinding inflate(LayoutInflater)
++ {static} ItemWorkmateDetailBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} ItemWorkmateDetailBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.viewmodel.WorkmatesViewModel {
+- UserRepository userRepository
+- MutableLiveData<List<User>> rawWorkmates
+- MutableLiveData<String> searchQuery
+- MediatorLiveData<List<User>> filteredWorkmates
+- void loadWorkmates()
+- void applyFilter(List<User>)
++ void setSearchQuery(String)
++ LiveData<List<User>> getWorkmates()
+}
+
+
+class com.lieruce.goforlunch.repository.ChatRepository {
+- {static} String COLLECTION_NAME
+- {static} ChatRepository instance
+- CollectionReference chatCollection
++ {static} ChatRepository getInstance()
++ Task<Void> sendMessage(Message)
++ Query getChatMessages()
+}
+
+
+class com.lieruce.goforlunch.databinding.ItemRestaurantBinding {
+- CardView rootView
++ ImageView iconWorkmates
++ TextView restaurantAddress
++ TextView restaurantDistance
++ TextView restaurantHours
++ TextView restaurantName
++ ImageView restaurantPhoto
++ RatingBar restaurantRating
++ TextView workmatesCount
++ CardView getRoot()
++ {static} ItemRestaurantBinding inflate(LayoutInflater)
++ {static} ItemRestaurantBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} ItemRestaurantBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.viewmodel.RestaurantDetailViewModelTest {
++ InstantTaskExecutorRule instantTaskExecutorRule
+- RestaurantDetailViewModel viewModel
+- RestaurantRepository restaurantRepository
+- UserRepository userRepository
+- AuthRepository authRepository
++ void setUp()
++ void setRestaurantId_shouldFetchDetailsAndWorkmates()
+}
+
+
+class com.lieruce.goforlunch.databinding.NavHeaderMainBinding {
+- LinearLayout rootView
++ ShapeableImageView navHeaderAvatar
++ TextView navHeaderEmail
++ TextView navHeaderName
++ LinearLayout getRoot()
++ {static} NavHeaderMainBinding inflate(LayoutInflater)
++ {static} NavHeaderMainBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} NavHeaderMainBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.repository.UserRepositoryTest {
+- UserRepository userRepository
+- MockedStatic<Uri> mockedUri
+- CollectionReference mockCollection
+- DocumentReference mockDocument
+- FirebaseUser mockFirebaseUser
++ void setUp()
++ void tearDown()
++ void createUser_shouldCallFirestoreSetWithCorrectData()
++ void createUser_withNoName_shouldUseEmailPrefix()
+}
+
+
+class com.lieruce.goforlunch.MainActivity {
+- MainViewModel mainViewModel
+- MapsViewModel mapsViewModel
+- WorkmatesViewModel workmatesViewModel
+- ActivityMainBinding binding
+- NavController navController
+- AppBarConfiguration appBarConfiguration
+- MenuProvider currentMenuProvider
+- ActivityResultLauncher<Intent> signInLauncher
+- ActivityResultLauncher<String[]> requestPermissionsLauncher
+# void onCreate(Bundle)
+- void requestPermissions()
+- void setupBackNavigation()
+- void setupToolbar()
+- void setupNavigation()
+- void showSearchMenu()
+- void hideSearchMenu()
+- void setupDrawerContent()
+- void navigateToYourLunch()
+- void updateNavHeader()
++ boolean onSupportNavigateUp()
+- void startLocationUpdates()
+- void launchSignInFlow()
+- void onSignInResult(FirebaseAuthUIAuthenticationResult)
+- void showSnackBar(String)
+}
+
+
+class com.lieruce.goforlunch.ExampleInstrumentedTest {
++ void useAppContext()
+}
+
+class com.lieruce.goforlunch.viewmodel.MapsViewModel {
+- LocationRepository locationRepository
+- RestaurantRepository restaurantRepository
+- UserRepository userRepository
+- MutableLiveData<Location> manualLocation
+- MediatorLiveData<Location> locationToUse
+- MediatorLiveData<List<Restaurant>> nearbyRestaurants
+- MutableLiveData<String> searchQuery
+- MediatorLiveData<List<Restaurant>> filteredRestaurants
+- java.util.Map<String,Integer> restaurantWorkmateCounts
+- java.util.Map<String,Integer> restaurantLikeCounts
+- void updateSocialData(List<com.lieruce.goforlunch.model.User>)
+- void applyEnrichment(List<Restaurant>)
+- void applyFilter(List<Restaurant>)
++ void setSearchQuery(String)
++ LiveData<Location> getUserLocation()
++ LiveData<List<Restaurant>> getNearbyRestaurants()
++ void refreshLocation()
++ void setManualLocation(Location)
++ void resetToCurrentLocation()
++ LiveData<Location> getLocationToUse()
+}
+
+
+class com.lieruce.goforlunch.databinding.ItemWorkmateBinding {
+- ConstraintLayout rootView
++ ShapeableImageView workmateAvatar
++ TextView workmateStatus
++ ConstraintLayout getRoot()
++ {static} ItemWorkmateBinding inflate(LayoutInflater)
++ {static} ItemWorkmateBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} ItemWorkmateBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.model.Message {
+- String id
+- String senderId
+- String senderName
+- String senderAvatarUrl
+- String text
+- Date timestamp
++ String getId()
++ String getSenderId()
++ String getSenderName()
++ String getSenderAvatarUrl()
++ String getText()
++ Date getTimestamp()
++ void setId(String)
++ void setSenderId(String)
++ void setSenderName(String)
++ void setSenderAvatarUrl(String)
++ void setText(String)
++ void setTimestamp(Date)
+}
+
+
+class com.lieruce.goforlunch.worker.WorkManagerHelper {
+- {static} String WORK_NAME
+- {static} String PREFS_NAME
+- {static} String KEY_NOTIFICATIONS
++ {static} void scheduleLunchReminder(Context)
++ {static} void cancelLunchReminder(Context)
++ {static} void runTestNotification(Context)
+}
+
+
+class com.lieruce.goforlunch.NavigationFlowTest {
++ ActivityScenarioRule<MainActivity> activityRule
+- void waitForView(int,long)
+- {static} ViewAction forceClick()
++ void clickingRestaurantInList_shouldOpenDetails()
+}
+
+
+class com.lieruce.goforlunch.ExampleUnitTest {
++ void addition_isCorrect()
+}
+
+class com.lieruce.goforlunch.databinding.FragmentChatBinding {
+- ConstraintLayout rootView
++ MaterialButton btnSend
++ EditText chatInput
++ RecyclerView chatRecyclerView
++ LinearLayout inputContainer
++ ConstraintLayout getRoot()
++ {static} FragmentChatBinding inflate(LayoutInflater)
++ {static} FragmentChatBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} FragmentChatBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.repository.UserRepository {
+- {static} String COLLECTION_NAME
+- {static} UserRepository instance
+- CollectionReference usersCollection
++ {static} UserRepository getInstance()
++ Task<Void> createUser(FirebaseUser)
++ Task<DocumentSnapshot> getUserData(String)
++ Query getUsersEatingAt(String)
++ Query getAllUsers()
++ Task<Void> updateChosenRestaurant(String,String,String,String)
++ Task<Void> updateLikedRestaurant(String,String,boolean)
+}
+
+
+class com.lieruce.goforlunch.databinding.NavHeaderMainBinding {
+- LinearLayout rootView
++ ShapeableImageView navHeaderAvatar
++ TextView navHeaderEmail
++ TextView navHeaderName
++ LinearLayout getRoot()
++ {static} NavHeaderMainBinding inflate(LayoutInflater)
++ {static} NavHeaderMainBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} NavHeaderMainBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.databinding.ItemChatMessageBinding {
+- ConstraintLayout rootView
++ ShapeableImageView messageAvatar
++ MaterialCardView messageBubble
++ TextView messageSenderName
++ TextView messageText
++ ConstraintLayout getRoot()
++ {static} ItemChatMessageBinding inflate(LayoutInflater)
++ {static} ItemChatMessageBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} ItemChatMessageBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.ui.restaurants.WorkmateDetailAdapter {
+- String currentUserId
+- List<User> workmates
++ void setWorkmates(List<User>)
++ WorkmateViewHolder onCreateViewHolder(ViewGroup,int)
++ void onBindViewHolder(WorkmateViewHolder,int)
++ int getItemCount()
+}
+
+
+class com.lieruce.goforlunch.ui.restaurants.WorkmateDetailAdapter$WorkmateViewHolder {
+- ItemWorkmateDetailBinding binding
++ void bind(User,String)
+}
+
+
+class com.lieruce.goforlunch.ui.restaurants.WorkmateDetailAdapter$WorkmateDiffCallback {
+- List<User> oldList
+- List<User> newList
++ int getOldListSize()
++ int getNewListSize()
++ boolean areItemsTheSame(int,int)
++ boolean areContentsTheSame(int,int)
+}
+
+
+class com.lieruce.goforlunch.databinding.FragmentRestaurantsBinding {
+- ConstraintLayout rootView
++ TextView emptyView
++ ProgressBar loadingIndicator
++ RecyclerView restaurantRecyclerView
++ SwipeRefreshLayout swipeRefreshLayout
++ ConstraintLayout getRoot()
++ {static} FragmentRestaurantsBinding inflate(LayoutInflater)
++ {static} FragmentRestaurantsBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} FragmentRestaurantsBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.databinding.ItemWorkmateBinding {
+- ConstraintLayout rootView
++ ShapeableImageView workmateAvatar
++ TextView workmateStatus
++ ConstraintLayout getRoot()
++ {static} ItemWorkmateBinding inflate(LayoutInflater)
++ {static} ItemWorkmateBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} ItemWorkmateBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.databinding.FragmentRestaurantDetailBinding {
+- ConstraintLayout rootView
++ LinearLayout actionsContainer
++ Button btnCall
++ Button btnLike
++ Button btnWebsite
++ TextView detailRestaurantAddress
++ TextView detailRestaurantHours
++ TextView detailRestaurantName
++ ImageView detailRestaurantPhoto
++ RatingBar detailRestaurantRating
++ ExtendedFloatingActionButton detailSelectFab
++ View infoContainer
++ TextView tvWhosJoiningTitle
++ RecyclerView workmatesRecyclerView
++ ConstraintLayout getRoot()
++ {static} FragmentRestaurantDetailBinding inflate(LayoutInflater)
++ {static} FragmentRestaurantDetailBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} FragmentRestaurantDetailBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.databinding.ItemWorkmateDetailBinding {
+- ConstraintLayout rootView
++ ShapeableImageView workmateAvatar
++ TextView workmateName
++ ConstraintLayout getRoot()
++ {static} ItemWorkmateDetailBinding inflate(LayoutInflater)
++ {static} ItemWorkmateDetailBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} ItemWorkmateDetailBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.ui.restaurants.RestaurantsFragment {
+- FragmentRestaurantsBinding binding
+- MapsViewModel mapsViewModel
+- RestaurantAdapter adapter
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
++ void onViewCreated(View,Bundle)
+- void setupViewModel()
+- void setupRecyclerView()
+- void observeData()
++ void onRestaurantClick(Restaurant)
++ void onDestroyView()
+}
+
+
+class com.lieruce.goforlunch.databinding.FragmentChatBinding {
+- ConstraintLayout rootView
++ MaterialButton btnSend
++ EditText chatInput
++ RecyclerView chatRecyclerView
++ LinearLayout inputContainer
++ ConstraintLayout getRoot()
++ {static} FragmentChatBinding inflate(LayoutInflater)
++ {static} FragmentChatBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} FragmentChatBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.BuildConfig {
++ {static} boolean DEBUG
++ {static} String APPLICATION_ID
++ {static} String BUILD_TYPE
++ {static} int VERSION_CODE
++ {static} String VERSION_NAME
++ {static} String MAPS_API_KEY
+}
+
+class com.lieruce.goforlunch.model.Restaurant {
+- String id
+- String name
+- String address
+- double rating
+- List<PhotoMetadata> photoMetadata
+- double latitude
+- double longitude
+- String openingHours
+- String phoneNumber
+- String websiteUrl
+- String photoUrl
+- int workmatesCount
+- int stars
++ String getId()
++ String getName()
++ String getAddress()
++ double getRating()
++ List<PhotoMetadata> getPhotoMetadatas()
++ double getLatitude()
++ double getLongitude()
++ String getOpeningHours()
++ String getPhoneNumber()
++ String getWebsiteUrl()
++ String getPhotoUrl()
++ int getWorkmatesCount()
++ int getStars()
++ void setWorkmatesCount(int)
++ void setStars(int)
+}
+
+
+class com.lieruce.goforlunch.repository.LocationRepository {
+- {static} LocationRepository instance
+- FusedLocationProviderClient fusedLocationProviderClient
+- MutableLiveData<Location> locationLiveData
+- LocationCallback locationCallback
++ {static} LocationRepository getInstance(Context)
++ LiveData<Location> getLocationLiveData()
++ void startLocationUpdates()
++ void stopLocationUpdates()
+}
+
+
+class com.lieruce.goforlunch.ui.restaurants.RestaurantAdapter {
+- OnRestaurantClickListener listener
+- List<Restaurant> restaurants
+- Location userLocation
++ void setRestaurants(List<Restaurant>)
++ void setUserLocation(Location)
++ RestaurantViewHolder onCreateViewHolder(ViewGroup,int)
++ void onBindViewHolder(RestaurantViewHolder,int)
++ int getItemCount()
+}
+
+
+interface com.lieruce.goforlunch.ui.restaurants.RestaurantAdapter$OnRestaurantClickListener {
+~ void onRestaurantClick(Restaurant)
+}
+
+class com.lieruce.goforlunch.ui.restaurants.RestaurantAdapter$RestaurantViewHolder {
+- ItemRestaurantBinding binding
++ void bind(Restaurant,Location)
+- String formatOpeningHours(String)
+}
+
+
+class com.lieruce.goforlunch.ui.restaurants.RestaurantAdapter$RestaurantDiffCallback {
+- List<Restaurant> oldList
+- List<Restaurant> newList
++ int getOldListSize()
++ int getNewListSize()
++ boolean areItemsTheSame(int,int)
++ boolean areContentsTheSame(int,int)
+}
+
+
+class com.lieruce.goforlunch.viewmodel.MainViewModel {
+- MutableLiveData<FirebaseUser> userLiveData
+- AuthRepository authRepository
+- UserRepository userRepository
++ LiveData<FirebaseUser> getUserLiveData()
++ void refreshUser()
++ Task<Void> signOut(Context)
++ Task<Void> createUser()
++ Task<DocumentSnapshot> getCurrentUserData()
+}
+
+
+class com.lieruce.goforlunch.worker.NotificationWorker {
+- {static} String CHANNEL_ID
+- {static} int NOTIFICATION_ID
++ Result doWork()
+- void showNotification(User,List<User>)
+}
+
+
+class com.lieruce.goforlunch.databinding.ActivityMainBinding {
+- DrawerLayout rootView
++ BottomNavigationView bottomNavigation
++ DrawerLayout drawerLayout
++ FragmentContainerView navHostFragment
++ NavigationView navView
++ MaterialToolbar toolbar
++ DrawerLayout getRoot()
++ {static} ActivityMainBinding inflate(LayoutInflater)
++ {static} ActivityMainBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} ActivityMainBinding bind(View)
+}
+
+
+class com.lieruce.goforlunch.ui.chat.ChatFragment {
+- FragmentChatBinding binding
+- ChatViewModel viewModel
+- ChatAdapter adapter
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
++ void onViewCreated(View,Bundle)
+- void setupViewModel()
+- void setupRecyclerView()
+- void observeMessages()
+- void setupInput()
++ void onDestroyView()
+}
+
+
+
+
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.FragmentWorkmatesBinding
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.ActivityMainBinding
+androidx.fragment.app.Fragment <|-- com.lieruce.goforlunch.ui.settings.SettingsFragment
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.FragmentRestaurantsBinding
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.ItemRestaurantBinding
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.FragmentSettingsBinding
+androidx.lifecycle.ViewModel <|-- com.lieruce.goforlunch.viewmodel.RestaurantDetailViewModel
+androidx.lifecycle.ViewModel <|-- com.lieruce.goforlunch.viewmodel.ChatViewModel
+androidx.fragment.app.Fragment <|-- com.lieruce.goforlunch.ui.map.MapFragment
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.FragmentMapBinding
+com.lieruce.goforlunch.ui.chat.Adapter <|-- com.lieruce.goforlunch.ui.chat.ChatAdapter
+com.lieruce.goforlunch.ui.chat.ChatAdapter +.. com.lieruce.goforlunch.ui.chat.ChatAdapter$ChatViewHolder
+com.lieruce.goforlunch.ui.chat.ViewHolder <|-- com.lieruce.goforlunch.ui.chat.ChatAdapter$ChatViewHolder
+com.lieruce.goforlunch.ui.chat.ChatAdapter +.. com.lieruce.goforlunch.ui.chat.ChatAdapter$ChatDiffCallback
+com.lieruce.goforlunch.ui.chat.Callback <|-- com.lieruce.goforlunch.ui.chat.ChatAdapter$ChatDiffCallback
+com.lieruce.goforlunch.ui.workmates.OnWorkmateClickListener <|.. com.lieruce.goforlunch.ui.workmates.WorkmatesFragment
+androidx.fragment.app.Fragment <|-- com.lieruce.goforlunch.ui.workmates.WorkmatesFragment
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.FragmentSettingsBinding
+com.lieruce.goforlunch.ui.workmates.Adapter <|-- com.lieruce.goforlunch.ui.workmates.WorkmateAdapter
+com.lieruce.goforlunch.ui.workmates.WorkmateAdapter +.. com.lieruce.goforlunch.ui.workmates.WorkmateAdapter$OnWorkmateClickListener
+com.lieruce.goforlunch.ui.workmates.WorkmateAdapter +.. com.lieruce.goforlunch.ui.workmates.WorkmateAdapter$WorkmateViewHolder
+com.lieruce.goforlunch.ui.workmates.ViewHolder <|-- com.lieruce.goforlunch.ui.workmates.WorkmateAdapter$WorkmateViewHolder
+com.lieruce.goforlunch.ui.workmates.WorkmateAdapter +.. com.lieruce.goforlunch.ui.workmates.WorkmateAdapter$WorkmateDiffCallback
+com.lieruce.goforlunch.ui.workmates.Callback <|-- com.lieruce.goforlunch.ui.workmates.WorkmateAdapter$WorkmateDiffCallback
+com.lieruce.goforlunch.repository.RestaurantRepository <|.. com.lieruce.goforlunch.repository.MockRestaurantRepository
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.FragmentRestaurantDetailBinding
+com.lieruce.goforlunch.viewmodel.Factory <|.. com.lieruce.goforlunch.viewmodel.ViewModelFactory
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.FragmentWorkmatesBinding
+com.lieruce.goforlunch.repository.RestaurantRepository <|.. com.lieruce.goforlunch.repository.GooglePlacesRepository
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.FragmentMapBinding
+androidx.fragment.app.Fragment <|-- com.lieruce.goforlunch.ui.restaurants.RestaurantDetailFragment
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.ItemChatMessageBinding
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.ItemWorkmateDetailBinding
+androidx.lifecycle.ViewModel <|-- com.lieruce.goforlunch.viewmodel.WorkmatesViewModel
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.ItemRestaurantBinding
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.NavHeaderMainBinding
+androidx.appcompat.app.AppCompatActivity <|-- com.lieruce.goforlunch.MainActivity
+androidx.lifecycle.ViewModel <|-- com.lieruce.goforlunch.viewmodel.MapsViewModel
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.ItemWorkmateBinding
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.FragmentChatBinding
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.NavHeaderMainBinding
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.ItemChatMessageBinding
+com.lieruce.goforlunch.ui.restaurants.Adapter <|-- com.lieruce.goforlunch.ui.restaurants.WorkmateDetailAdapter
+com.lieruce.goforlunch.ui.restaurants.WorkmateDetailAdapter +.. com.lieruce.goforlunch.ui.restaurants.WorkmateDetailAdapter$WorkmateViewHolder
+com.lieruce.goforlunch.ui.restaurants.ViewHolder <|-- com.lieruce.goforlunch.ui.restaurants.WorkmateDetailAdapter$WorkmateViewHolder
+com.lieruce.goforlunch.ui.restaurants.WorkmateDetailAdapter +.. com.lieruce.goforlunch.ui.restaurants.WorkmateDetailAdapter$WorkmateDiffCallback
+com.lieruce.goforlunch.ui.restaurants.Callback <|-- com.lieruce.goforlunch.ui.restaurants.WorkmateDetailAdapter$WorkmateDiffCallback
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.FragmentRestaurantsBinding
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.ItemWorkmateBinding
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.FragmentRestaurantDetailBinding
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.ItemWorkmateDetailBinding
+com.lieruce.goforlunch.ui.restaurants.OnRestaurantClickListener <|.. com.lieruce.goforlunch.ui.restaurants.RestaurantsFragment
+androidx.fragment.app.Fragment <|-- com.lieruce.goforlunch.ui.restaurants.RestaurantsFragment
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.FragmentChatBinding
+com.lieruce.goforlunch.ui.restaurants.Adapter <|-- com.lieruce.goforlunch.ui.restaurants.RestaurantAdapter
+com.lieruce.goforlunch.ui.restaurants.RestaurantAdapter +.. com.lieruce.goforlunch.ui.restaurants.RestaurantAdapter$OnRestaurantClickListener
+com.lieruce.goforlunch.ui.restaurants.RestaurantAdapter +.. com.lieruce.goforlunch.ui.restaurants.RestaurantAdapter$RestaurantViewHolder
+com.lieruce.goforlunch.ui.restaurants.ViewHolder <|-- com.lieruce.goforlunch.ui.restaurants.RestaurantAdapter$RestaurantViewHolder
+com.lieruce.goforlunch.ui.restaurants.RestaurantAdapter +.. com.lieruce.goforlunch.ui.restaurants.RestaurantAdapter$RestaurantDiffCallback
+com.lieruce.goforlunch.ui.restaurants.Callback <|-- com.lieruce.goforlunch.ui.restaurants.RestaurantAdapter$RestaurantDiffCallback
+androidx.lifecycle.ViewModel <|-- com.lieruce.goforlunch.viewmodel.MainViewModel
+androidx.work.Worker <|-- com.lieruce.goforlunch.worker.NotificationWorker
+androidx.viewbinding.ViewBinding <|.. com.lieruce.goforlunch.databinding.ActivityMainBinding
+androidx.fragment.app.Fragment <|-- com.lieruce.goforlunch.ui.chat.ChatFragment
+@enduml

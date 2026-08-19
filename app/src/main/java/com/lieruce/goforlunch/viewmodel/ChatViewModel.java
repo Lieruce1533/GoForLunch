@@ -11,6 +11,10 @@ import com.lieruce.goforlunch.repository.ChatRepository;
 
 import java.util.List;
 
+/**
+ * ViewModel managing the group chat logic.
+ * Handles message persistence and provides a real-time stream of the conversation.
+ */
 public class ChatViewModel extends ViewModel {
 
     private final ChatRepository chatRepository;

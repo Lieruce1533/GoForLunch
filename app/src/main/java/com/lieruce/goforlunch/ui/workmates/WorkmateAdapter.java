@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Adapter for the main Workmates list.
+ * Implements context-aware identity tagging ("I / Je") and visual hierarchy for social status.
+ */
 public class WorkmateAdapter extends RecyclerView.Adapter<WorkmateAdapter.WorkmateViewHolder> {
 
     public interface OnWorkmateClickListener {

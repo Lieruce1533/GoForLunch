@@ -35,6 +35,10 @@ import com.lieruce.goforlunch.viewmodel.ViewModelFactory;
 
 import java.util.List;
 
+/**
+ * Fragment responsible for displaying the interactive Google Map.
+ * Provides features like custom-branded markers, manual area searching, and location resetting.
+ */
 public class MapFragment extends Fragment {
 
     private FragmentMapBinding binding;
@@ -106,29 +110,9 @@ public class MapFragment extends Fragment {
         });
 
         // Manual Location Selection logic
-        setupManualLocationListeners();
-    }
-
-    private void setupManualLocationListeners() {
-        googleMap.setOnCameraMoveStartedListener(reason -> {
-            if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
-                binding.btnSearchArea.setVisibility(View.VISIBLE);
-            }
-        });
-
-        binding.btnSearchArea.setOnClickListener(v -> {
-            LatLng center = googleMap.getCameraPosition().target;
-            android.location.Location location = new android.location.Location("manual");
-            location.setLatitude(center.latitude);
-            location.setLongitude(center.longitude);
-            viewModel.setManualLocation(location);
-            binding.btnSearchArea.setVisibility(View.GONE);
-        });
-
         binding.fabMyLocation.setOnClickListener(v -> {
             viewModel.resetToCurrentLocation();
             isInitialLocationSet = false; // Allow re-centering once
-            binding.btnSearchArea.setVisibility(View.GONE);
         });
     }
 
@@ -168,6 +152,12 @@ public class MapFragment extends Fragment {
         Navigation.findNavController(requireView()).navigate(R.id.action_navigation_map_to_restaurantDetailFragment, args);
     }
 
+    /**
+     * Dynamically generates a custom Map Marker bitmap.
+     * Layers a tinted Pin shape with a darker-tinted Restaurant icon for a professional "stamped" look.
+     * @param color The background color of the pin.
+     * @return A BitmapDescriptor ready for use on the map.
+     */
     private BitmapDescriptor getBitmapDescriptorFromVector(int color) {
         Drawable background = ContextCompat.getDrawable(requireContext(), R.drawable.ic_map_pin_shape);
         Drawable icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_default_restaurant);
