@@ -17,9 +17,11 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.lieruce.goforlunch.model.Restaurant;
+import com.lieruce.goforlunch.repository.AuthRepository;
 import com.lieruce.goforlunch.repository.LocationRepository;
 import com.lieruce.goforlunch.repository.RestaurantRepository;
 import com.lieruce.goforlunch.repository.UserRepository;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.junit.After;
 import org.junit.Before;
@@ -39,9 +41,11 @@ public class MapsViewModelTest {
     private LocationRepository locationRepository;
     private RestaurantRepository restaurantRepository;
     private UserRepository userRepository;
+    private AuthRepository authRepository;
 
     private MutableLiveData<Location> locationLiveData;
     private MutableLiveData<List<Restaurant>> restaurantsLiveData;
+    private MutableLiveData<FirebaseUser> userLiveData;
     
     private MockedStatic<Log> mockedLog;
     private MockedStatic<Location> mockedLocation;
@@ -51,12 +55,15 @@ public class MapsViewModelTest {
         locationRepository = mock(LocationRepository.class);
         restaurantRepository = mock(RestaurantRepository.class);
         userRepository = mock(UserRepository.class);
+        authRepository = mock(AuthRepository.class);
 
         locationLiveData = new MutableLiveData<>();
         restaurantsLiveData = new MutableLiveData<>();
+        userLiveData = new MutableLiveData<>();
 
         when(locationRepository.getLocationLiveData()).thenReturn(locationLiveData);
         when(restaurantRepository.getNearbyRestaurantsLiveData()).thenReturn(restaurantsLiveData);
+        when(authRepository.getUserLiveData()).thenReturn(userLiveData);
         
         // Mock Firestore Query returned by getAllUsers
         CollectionReference mockCollection = mock(CollectionReference.class);
@@ -65,7 +72,7 @@ public class MapsViewModelTest {
         // Mock Android Log
         mockedLog = mockStatic(Log.class);
         
-        mapsViewModel = new MapsViewModel(locationRepository, restaurantRepository, userRepository);
+        mapsViewModel = new MapsViewModel(locationRepository, restaurantRepository, userRepository, authRepository);
         
         // Observe to trigger MediatorLiveData
         mapsViewModel.getNearbyRestaurants().observeForever(restaurants -> {});

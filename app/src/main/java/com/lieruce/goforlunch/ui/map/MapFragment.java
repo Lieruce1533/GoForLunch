@@ -36,7 +36,7 @@ import com.lieruce.goforlunch.viewmodel.ViewModelFactory;
 import java.util.List;
 
 /**
- * Fragment responsible for displaying the interactive Google Map.
+ * Fragment responsible for displaying the interactive Google Maps.
  * Provides features like custom-branded markers, manual area searching, and location resetting.
  */
 public class MapFragment extends Fragment {
@@ -74,18 +74,27 @@ public class MapFragment extends Fragment {
     private void setupMap() {
         if (googleMap == null) return;
 
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            googleMap.setMyLocationEnabled(true);
-            googleMap.getUiSettings().setMyLocationButtonEnabled(false); // Using custom FAB instead
-        }
-
         // Observe User Location (only for initial camera move)
         viewModel.getLocationToUse().observe(getViewLifecycleOwner(), location -> {
-            if (location != null && !isInitialLocationSet) {
-                LatLng userLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 13f));
-                isInitialLocationSet = true;
+            if (location != null) {
+                // Enable standard blue dot only for real GPS locations
+                boolean isRealGps = !"mock".equals(location.getProvider());
+                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    googleMap.setMyLocationEnabled(isRealGps);
+                    googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+                }
+
+                if (!isInitialLocationSet) {
+                    LatLng userLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 13f));
+                    isInitialLocationSet = true;
+                }
+                
+                // If it's a mock location, we need to manually draw the user marker 
+                // because setMyLocationEnabled(true) won't show it at the mock coordinates.
+                if (!isRealGps) {
+                    updateMapMarkers(viewModel.getNearbyRestaurants().getValue());
+                }
             }
         });
 
@@ -117,9 +126,24 @@ public class MapFragment extends Fragment {
     }
 
     private void updateMapMarkers(List<Restaurant> restaurants) {
-        if (googleMap == null || restaurants == null) return;
+        if (googleMap == null) return;
 
         googleMap.clear();
+
+        // 1. Add User Marker if in Mock Mode
+        android.location.Location currentLocation = viewModel.getLocationToUse().getValue();
+        if (currentLocation != null && "mock".equals(currentLocation.getProvider())) {
+            LatLng userPos = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+            int azureColor = Color.parseColor("#007FFF");
+            googleMap.addMarker(new MarkerOptions()
+                    .position(userPos)
+                    .title(getString(R.string.me))
+                    .zIndex(1.0f) // Keep user on top
+                    .icon(getBitmapDescriptorFromVector(azureColor, R.drawable.ic_workmates, 1.2f)));
+        }
+
+        // 2. Add Restaurant Markers
+        if (restaurants == null) return;
         for (Restaurant restaurant : restaurants) {
             LatLng position = new LatLng(restaurant.getLatitude(), restaurant.getLongitude());
             
@@ -130,18 +154,17 @@ public class MapFragment extends Fragment {
             // --- COLOR LOGIC ---
             int markerColor;
             if (restaurant.getWorkmatesCount() > 0) {
-                // Someone is eating here!
                 markerColor = ContextCompat.getColor(requireContext(), R.color.colorMarkerGreen);
             } else {
                 markerColor = ContextCompat.getColor(requireContext(), R.color.colorMarkerRed);
             }
             
-            markerOptions.icon(getBitmapDescriptorFromVector(markerColor));
+            markerOptions.icon(getBitmapDescriptorFromVector(markerColor, R.drawable.ic_default_restaurant, 2.0f));
 
             Marker marker = googleMap.addMarker(markerOptions);
             
             if (marker != null) {
-                marker.setTag(restaurant); // Store the restaurant object in the marker
+                marker.setTag(restaurant);
             }
         }
     }
@@ -154,24 +177,27 @@ public class MapFragment extends Fragment {
 
     /**
      * Dynamically generates a custom Map Marker bitmap.
-     * Layers a tinted Pin shape with a darker-tinted Restaurant icon for a professional "stamped" look.
+     * Layers a tinted Pin shape with a darker-tinted icon for a professional "stamped" look.
      * @param color The background color of the pin.
+     * @param iconResId The resource ID of the icon to draw inside.
+     * @param scale Overall size multiplier.
      * @return A BitmapDescriptor ready for use on the map.
      */
-    private BitmapDescriptor getBitmapDescriptorFromVector(int color) {
+    private BitmapDescriptor getBitmapDescriptorFromVector(int color, int iconResId, float scale) {
         Drawable background = ContextCompat.getDrawable(requireContext(), R.drawable.ic_map_pin_shape);
-        Drawable icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_default_restaurant);
+        Drawable icon = ContextCompat.getDrawable(requireContext(), iconResId);
         
         if (background == null || icon == null) return BitmapDescriptorFactory.defaultMarker();
 
         // 1. Prepare background (the pin)
         background.setTint(color);
-        int width = background.getIntrinsicWidth() * 2; // Make it bigger for better resolution
-        int height = background.getIntrinsicHeight() * 2;
+        int width = (int) (background.getIntrinsicWidth() * scale);
+        int height = (int) (background.getIntrinsicHeight() * scale);
         background.setBounds(0, 0, width, height);
 
-        // 2. Prepare icon (fork & knife)
+        // 2. Prepare icon (e.g., fork & knife or person)
         icon.setTint(darkenColor(color, 0.7f)); // 30% darker than background
+        
         // Center it in the pin head (top part)
         int iconSize = (int) (width * 0.5);
         int left = (width - iconSize) / 2;

@@ -371,3 +371,17 @@
     *   **Action (Build)**: Enabled R8 code obfuscation (`minifyEnabled true`) and resource shrinking (`shrinkResources true`) for the release build type to secure and optimize the final application.
 *   **Quality Assurance**:
     *   **Action**: Verified all unit tests pass (7/7).
+
+## Session: 2026-08-20
+
+### Summary of Work:
+
+*   **Map & Presentation Polish**:
+    *   **Action (Mock UI)**: Implemented a manual blue marker to represent the user's position when in "Presentation Mode" at the Louvre coordinates. This ensures the jury sees the "Me" location even without real GPS.
+    *   **Action (Map Optimization)**: Simplified the Map UI by removing the manual "Search area" button and locking the Google Places fetch to **once per session** to strictly comply with API cost-management requirements.
+*   **Reactive Data Flow & Bug Fixes**:
+    *   **Action (Auth Logic)**: Refactored ViewModels to use **Auth-Driven Reactive Listening**. Firestore listeners now start automatically only AFTER a valid login is detected, resolving the "Empty List" issue on first connect.
+    *   **Action (Session Management)**: Implemented a clean process-level reboot using `System.exit(0)` on logout to fully clear Firestore's local cache and prevent cross-user data leaks.
+*   **Comprehensive Quality Assurance**:
+    *   **Action (Unit Tests)**: Fixed and updated the unit test suite to include the new `AuthRepository` dependencies. Added a new test for `WorkmatesViewModel`. **Status: 8/8 PASS.**
+    *   **Action (UI Tests)**: Successfully ran instrumented UI tests on a physical device. **Status: 4/4 PASS.**

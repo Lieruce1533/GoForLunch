@@ -52,8 +52,8 @@ public class MapsViewModel extends ViewModel {
         // --- SIMULATION TRICK ---
         if (restaurantRepository instanceof MockRestaurantRepository) {
             Location louvre = new Location("mock");
-            louvre.setLatitude(48.8606);
-            louvre.setLongitude(2.3376);
+            louvre.setLatitude(48.8591);
+            louvre.setLongitude(2.3290);
             manualLocation.setValue(louvre);
         }
 

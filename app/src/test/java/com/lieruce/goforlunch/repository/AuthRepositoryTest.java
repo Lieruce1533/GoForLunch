@@ -10,10 +10,16 @@ import com.google.firebase.auth.FirebaseUser;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.MockedStatic;
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+
 public class AuthRepositoryTest {
+
+    @Rule
+    public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     private AuthRepository authRepository;
     private MockedStatic<FirebaseAuth> mockedFirebaseAuth;

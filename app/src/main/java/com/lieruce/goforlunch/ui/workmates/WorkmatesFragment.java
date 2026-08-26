@@ -80,7 +80,7 @@ public class WorkmatesFragment extends Fragment implements WorkmateAdapter.OnWor
         if (user.getChosenRestaurantId() != null) {
             Bundle args = new Bundle();
             args.putString("restaurantId", user.getChosenRestaurantId());
-            Navigation.findNavController(requireView()).navigate(R.id.restaurantDetailFragment, args);
+            Navigation.findNavController(requireView()).navigate(R.id.action_navigation_workmates_to_restaurantDetailFragment, args);
         } else {
             String currentUserId = AuthRepository.getInstance().getCurrentUser() != null
                     ? AuthRepository.getInstance().getCurrentUser().getUid()

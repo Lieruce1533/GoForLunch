@@ -29,7 +29,11 @@
         android:id="@+id/navigation_workmates"
         android:name="com.lieruce.goforlunch.ui.workmates.WorkmatesFragment"
         android:label="Workmates"
-        tools:layout="@layout/fragment_workmates" />
+        tools:layout="@layout/fragment_workmates">
+        <action
+            android:id="@+id/action_navigation_workmates_to_restaurantDetailFragment"
+            app:destination="@id/restaurantDetailFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/chatFragment"
