@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView((android.view.View) binding.getRoot());
 
         ViewModelFactory factory = ViewModelFactory.getInstance(this);
         mainViewModel = new ViewModelProvider(this, factory).get(MainViewModel.class);

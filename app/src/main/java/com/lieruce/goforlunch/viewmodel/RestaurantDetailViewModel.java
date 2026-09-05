@@ -40,9 +40,7 @@ public class RestaurantDetailViewModel extends ViewModel {
 
     public void setRestaurantId(String restaurantId) {
         // 1. Fetch full restaurant details on-demand (expensive fields like phone/website)
-        restaurantRepository.getRestaurantDetails(restaurantId).addOnSuccessListener(restaurant -> {
-            restaurantLiveData.setValue(restaurant);
-        });
+        restaurantRepository.getRestaurantDetails(restaurantId).addOnSuccessListener(restaurantLiveData::setValue);
 
         // 2. Fetch current user's data to check selection and likes
         FirebaseUser currentUser = authRepository.getCurrentUser();
