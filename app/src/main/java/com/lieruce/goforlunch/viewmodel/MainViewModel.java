@@ -36,6 +36,7 @@ public class MainViewModel extends ViewModel {
         return authRepository.signOut(context);
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public Task<Void> createUser() {
         return userRepository.createUser(authRepository.getCurrentUser());
     }

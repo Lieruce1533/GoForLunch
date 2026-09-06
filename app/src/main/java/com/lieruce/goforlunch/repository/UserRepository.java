@@ -99,6 +99,7 @@ public class UserRepository {
      * Updates the user's lunch choice for the current day.
      * Stores the restaurant metadata directly in the user document for efficient list rendering.
      */
+    @SuppressWarnings("UnusedReturnValue")
     public Task<Void> updateChosenRestaurant(String uid, String restaurantId, String restaurantName, String restaurantAddress) {
         Map<String, Object> updates = new HashMap<>();
         updates.put("chosenRestaurantId", restaurantId);
@@ -113,6 +114,7 @@ public class UserRepository {
      * Toggles a restaurant in the user's "Liked" list.
      * Uses Firestore FieldValue operators for atomic array updates.
      */
+    @SuppressWarnings("UnusedReturnValue")
     public Task<Void> updateLikedRestaurant(String uid, String restaurantId, boolean isLiked) {
         Map<String, Object> updates = new HashMap<>();
         if (isLiked) {

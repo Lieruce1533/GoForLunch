@@ -51,10 +51,6 @@ public class AuthRepository {
         return userLiveData;
     }
 
-    public void refreshUser() {
-        userLiveData.setValue(firebaseAuth.getCurrentUser());
-    }
-
     public Task<Void> signOut(Context context) {
         return AuthUI.getInstance().signOut(context);
     }

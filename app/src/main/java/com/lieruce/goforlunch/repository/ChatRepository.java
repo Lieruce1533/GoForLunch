@@ -30,7 +30,7 @@ public class ChatRepository {
         }
         return instance;
     }
-
+    @SuppressWarnings("UnusedReturnValue")
     public Task<Void> sendMessage(Message message) {
         return chatCollection.document().set(message);
     }
