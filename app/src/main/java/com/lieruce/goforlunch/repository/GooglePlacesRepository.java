@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Real-world implementation of RestaurantRepository using the Google Places SDK.
@@ -40,6 +41,7 @@ public class GooglePlacesRepository implements RestaurantRepository {
     private final Context context;
     private final PlacesClient placesClient;
     private final MutableLiveData<List<Restaurant>> nearbyRestaurantsLiveData = new MutableLiveData<>();
+    private final Double DEFAULT_RADIUS = 2000.0;
     
     // Cache to avoid re-fetching details for the same restaurant during the session
     private final Map<String, Restaurant> restaurantCache = new HashMap<>();
@@ -75,7 +77,7 @@ public class GooglePlacesRepository implements RestaurantRepository {
         if (location == null) return;
 
         LatLng center = new LatLng(location.getLatitude(), location.getLongitude());
-        LocationRestriction locationRestriction = CircularBounds.newInstance(center, 2000);
+        LocationRestriction locationRestriction = CircularBounds.newInstance(center, DEFAULT_RADIUS);
 
         List<Place.Field> searchFields = Arrays.asList(
                 Place.Field.ID,
@@ -141,7 +143,7 @@ public class GooglePlacesRepository implements RestaurantRepository {
                 restaurantCache.put(placeId, fullRestaurant);
                 return Tasks.forResult(fullRestaurant);
             }
-            throw task.getException();
+            throw Objects.requireNonNull(task.getException());
         });
     }
 
@@ -176,18 +178,7 @@ public class GooglePlacesRepository implements RestaurantRepository {
 
     private Restaurant mapPlaceToRestaurant(Place place) {
         LatLng loc = place.getLocation();
-        String name = "Unknown";
-        
-        if (place.getDisplayName() != null) {
-            name = String.valueOf(place.getDisplayName());
-            if (name.contains("text=")) {
-                try {
-                    name = name.substring(name.indexOf("text=") + 5, name.indexOf(","));
-                } catch (Exception ignored) {}
-            }
-        } else if (place.getName() != null) {
-            name = place.getName();
-        }
+        String name = place.getDisplayName() != null ? place.getDisplayName() : "Unknown";
 
         return new Restaurant(
                 place.getId(),
@@ -205,7 +196,6 @@ public class GooglePlacesRepository implements RestaurantRepository {
     }
     private String getOpeningHoursString(Place place) {
         if (place.getCurrentOpeningHours() != null && 
-            place.getCurrentOpeningHours().getWeekdayText() != null && 
             !place.getCurrentOpeningHours().getWeekdayText().isEmpty()) {
             
             return place.getCurrentOpeningHours().getWeekdayText().get(0);

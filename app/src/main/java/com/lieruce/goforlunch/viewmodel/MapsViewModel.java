@@ -1,6 +1,7 @@
 package com.lieruce.goforlunch.viewmodel;
 
 import android.location.Location;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
@@ -8,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.lieruce.goforlunch.model.Restaurant;
+import com.lieruce.goforlunch.model.User;
 import com.lieruce.goforlunch.repository.AuthRepository;
 import com.lieruce.goforlunch.repository.LocationRepository;
 import com.lieruce.goforlunch.repository.MockRestaurantRepository;
@@ -16,7 +18,9 @@ import com.lieruce.goforlunch.repository.UserRepository;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * ViewModel for the Map and Restaurant List views.
@@ -38,8 +42,8 @@ public class MapsViewModel extends ViewModel {
     private ListenerRegistration socialListener;
 
     // Cache for social data (counts and likes) to prevent flickering
-    private final java.util.Map<String, Integer> restaurantWorkmateCounts = new java.util.HashMap<>();
-    private final java.util.Map<String, Integer> restaurantLikeCounts = new java.util.HashMap<>();
+    private final Map<String, Integer> restaurantWorkmateCounts = new HashMap<>();
+    private final Map<String, Integer> restaurantLikeCounts = new HashMap<>();
 
     public MapsViewModel(LocationRepository locationRepository, 
                          RestaurantRepository restaurantRepository,
@@ -102,11 +106,11 @@ public class MapsViewModel extends ViewModel {
 
         socialListener = userRepository.getAllUsers().addSnapshotListener((value, error) -> {
             if (error != null) {
-                android.util.Log.e("MapsViewModel", "Social sync listener failed: ", error);
+                Log.e("MapsViewModel", "Social sync listener failed: ", error);
                 return;
             }
             if (value != null) {
-                updateSocialData(value.toObjects(com.lieruce.goforlunch.model.User.class));
+                updateSocialData(value.toObjects(User.class));
             }
         });
     }
@@ -118,22 +122,22 @@ public class MapsViewModel extends ViewModel {
         }
     }
 
-    private void updateSocialData(List<com.lieruce.goforlunch.model.User> users) {
+    private void updateSocialData(List<User> users) {
         restaurantWorkmateCounts.clear();
         restaurantLikeCounts.clear();
         
-        for (com.lieruce.goforlunch.model.User user : users) {
+        for (User user : users) {
             String rid = user.getChosenRestaurantId();
             if (rid != null && !rid.isEmpty()) {
-                int count = restaurantWorkmateCounts.containsKey(rid) ? restaurantWorkmateCounts.get(rid) : 0;
-                restaurantWorkmateCounts.put(rid, count + 1);
+                Integer count = restaurantWorkmateCounts.get(rid);
+                restaurantWorkmateCounts.put(rid, (count != null ? count : 0) + 1);
             }
             
             List<String> liked = user.getLikedRestaurants();
             if (liked != null) {
                 for (String likedId : liked) {
-                    int lCount = restaurantLikeCounts.containsKey(likedId) ? restaurantLikeCounts.get(likedId) : 0;
-                    restaurantLikeCounts.put(likedId, lCount + 1);
+                    Integer lCount = restaurantLikeCounts.get(likedId);
+                    restaurantLikeCounts.put(likedId, (lCount != null ? lCount : 0) + 1);
                 }
             }
         }
@@ -179,9 +183,7 @@ public class MapsViewModel extends ViewModel {
     }
 
     public void setSearchQuery(String query) { searchQuery.setValue(query); }
-    public LiveData<Location> getUserLocation() { return locationRepository.getLocationLiveData(); }
     public LiveData<List<Restaurant>> getNearbyRestaurants() { return filteredRestaurants; }
-    public void setManualLocation(Location location) { manualLocation.setValue(location); }
     public void resetToCurrentLocation() {
         manualLocation.setValue(null);
         Location gps = locationRepository.getLocationLiveData().getValue();
