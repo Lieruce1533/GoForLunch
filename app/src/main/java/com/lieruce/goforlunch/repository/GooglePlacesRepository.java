@@ -163,7 +163,7 @@ public class GooglePlacesRepository implements RestaurantRepository {
                     restaurant.getName(),
                     restaurant.getAddress(),
                     restaurant.getRating(),
-                    restaurant.getPhotoMetadatas(),
+                    restaurant.getPhotoMetadata(),
                     restaurant.getLatitude(),
                     restaurant.getLongitude(),
                     restaurant.getOpeningHours(),

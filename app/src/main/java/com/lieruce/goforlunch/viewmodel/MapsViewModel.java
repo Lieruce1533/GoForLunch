@@ -152,7 +152,7 @@ public class MapsViewModel extends ViewModel {
         if (restaurants == null) return new ArrayList<>();
         List<Restaurant> enriched = new ArrayList<>();
         for (Restaurant r : restaurants) {
-            Restaurant copy = new Restaurant(r.getId(), r.getName(), r.getAddress(), r.getRating(), r.getPhotoMetadatas(), r.getLatitude(), r.getLongitude(), r.getOpeningHours(), r.getPhoneNumber(), r.getWebsiteUrl(), r.getPhotoUrl());
+            Restaurant copy = new Restaurant(r.getId(), r.getName(), r.getAddress(), r.getRating(), r.getPhotoMetadata(), r.getLatitude(), r.getLongitude(), r.getOpeningHours(), r.getPhoneNumber(), r.getWebsiteUrl(), r.getPhotoUrl());
             Integer wCount = restaurantWorkmateCounts.get(r.getId());
             copy.setWorkmatesCount(wCount != null ? wCount : 0);
             Integer likes = restaurantLikeCounts.get(r.getId());

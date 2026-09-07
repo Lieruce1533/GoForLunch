@@ -44,7 +44,7 @@ public class Restaurant {
     public String getName() { return name; }
     public String getAddress() { return address; }
     public double getRating() { return rating; }
-    public List<PhotoMetadata> getPhotoMetadatas() { return photoMetadata; }
+    public List<PhotoMetadata> getPhotoMetadata() { return photoMetadata; }
     public double getLatitude() { return latitude; }
     public double getLongitude() { return longitude; }
     public String getOpeningHours() { return openingHours; }
