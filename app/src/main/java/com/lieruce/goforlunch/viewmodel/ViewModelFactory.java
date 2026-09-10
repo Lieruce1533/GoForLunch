@@ -51,7 +51,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         boolean useMock = prefs.getBoolean("presentation_mode", true);
         
         if (useMock) {
-            this.restaurantRepository = new MockRestaurantRepository();
+            this.restaurantRepository = new MockRestaurantRepository(context);
         } else {
             this.restaurantRepository = GooglePlacesRepository.getInstance(context);
         }

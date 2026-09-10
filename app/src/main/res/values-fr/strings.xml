@@ -52,4 +52,5 @@
     <string name="whos_joining">Qui nous rejoint ?</string>
     <string name="presentation_mode">Mode Présentation (Données Simulées)</string>
     <string name="presentation_mode_desc">Basculez entre les données simulées et l\'API Google Places réelle. L\'application sera actualisée.</string>
+    <string name="check_details_for_hours">Consulter les horaires</string>
 </resources>

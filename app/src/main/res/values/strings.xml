@@ -52,4 +52,5 @@
     <string name="whos_joining">Who\'s joining?</string>
     <string name="presentation_mode">Presentation Mode (Mock Data)</string>
     <string name="presentation_mode_desc">Switch between simulated data and real Google Places API. The app will refresh to apply changes.</string>
+    <string name="check_details_for_hours">Check details for hours</string>
 </resources>

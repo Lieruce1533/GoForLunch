@@ -21,6 +21,7 @@ import com.google.android.libraries.places.api.net.FetchResolvedPhotoUriRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.api.net.SearchNearbyRequest;
 import com.lieruce.goforlunch.BuildConfig;
+import com.lieruce.goforlunch.R;
 import com.lieruce.goforlunch.model.Restaurant;
 
 import java.util.ArrayList;
@@ -208,6 +209,6 @@ public class GooglePlacesRepository implements RestaurantRepository {
             }
             return weekdayTexts.get(0);
         }
-        return "Check details for hours";
+        return context.getString(R.string.check_details_for_hours);
     }
 }
