@@ -25,6 +25,7 @@ import com.lieruce.goforlunch.model.Restaurant;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -198,7 +199,14 @@ public class GooglePlacesRepository implements RestaurantRepository {
         if (place.getCurrentOpeningHours() != null && 
             !place.getCurrentOpeningHours().getWeekdayText().isEmpty()) {
             
-            return place.getCurrentOpeningHours().getWeekdayText().get(0);
+            List<String> weekdayTexts = place.getCurrentOpeningHours().getWeekdayText();
+            int dayOfWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+            int todayIndex = (dayOfWeek + 5) % 7;
+            
+            if (todayIndex < weekdayTexts.size()) {
+                return weekdayTexts.get(todayIndex);
+            }
+            return weekdayTexts.get(0);
         }
         return "Check details for hours";
     }
